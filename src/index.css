@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, "Inter", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", sans-serif;
+  --font-mono: "Pretendard Variable", Pretendard, "Inter", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+@layer base {
+  html, body {
+    font-family: "Pretendard Variable", Pretendard, "Inter", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    font-variant-numeric: normal;
+    font-feature-settings: "zero" 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *, ::before, ::after {
+    font-variant-numeric: normal;
+    font-feature-settings: "zero" 0;
+  }
+}

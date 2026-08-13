@@ -173,7 +173,7 @@ export default function ProductDetail({
                           모델명
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-neutral-950 font-mono tabular-nums font-bold text-[15.5px] sm:text-[17.5px] tracking-tight">{product.name}</td>
+                      <td className="px-4 py-3.5 text-neutral-950 font-sans tabular-nums font-bold text-[15.5px] sm:text-[17.5px] tracking-tight">{product.name}</td>
                     </tr>
                     {product.isProcurement && (
                       <tr className="border-b border-neutral-200/80">
@@ -182,7 +182,7 @@ export default function ProductDetail({
                             식별번호
                           </span>
                         </td>
-                        <td className="px-4 py-3.5 text-neutral-950 font-mono tabular-nums font-bold text-[15.5px] sm:text-[17.5px] tracking-tight">{product.identificationNo || '-'}</td>
+                        <td className="px-4 py-3.5 text-neutral-950 font-sans tabular-nums font-bold text-[15.5px] sm:text-[17.5px] tracking-tight">{product.identificationNo || '-'}</td>
                       </tr>
                     )}
                     <tr className="border-b border-neutral-200/80">
@@ -191,7 +191,7 @@ export default function ProductDetail({
                           규격
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-neutral-900 font-mono tabular-nums font-semibold text-[15.5px] sm:text-[17.5px] leading-relaxed tracking-tight">{product.size}</td>
+                      <td className="px-4 py-3.5 text-neutral-900 font-sans tabular-nums font-semibold text-[15.5px] sm:text-[17.5px] leading-relaxed tracking-tight">{product.size}</td>
                     </tr>
                     <tr className="border-b border-neutral-200/80">
                       <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-[15.5px] sm:text-[17.5px] border-r border-neutral-200/80">
@@ -208,7 +208,7 @@ export default function ProductDetail({
                         </span>
                       </td>
                       <td className="px-4 py-3.5 text-neutral-950 font-sans text-[15.5px] sm:text-[17.5px] tracking-tight">
-                        <span className="text-[18px] sm:text-[23px] font-black font-mono tabular-nums text-neutral-950 tracking-tight">{formatPriceNumber(product.price)}</span>
+                        <span className="text-[18px] sm:text-[23px] font-black font-sans tabular-nums text-neutral-950 tracking-tight">{formatPriceNumber(product.price)}</span>
                         <span className="text-[15.5px] sm:text-[17.5px] font-bold text-neutral-800 ml-1">원</span>
                         <span className="text-xs sm:text-sm font-sans font-medium text-neutral-500 ml-2">(VAT 포함)</span>
                       </td>

@@ -97,23 +97,23 @@ export default function ProductCard({ product, onClick, isAdminLoggedIn = false,
         <div className="space-y-3 text-[13.5px] font-sans text-neutral-600 flex-grow border-t border-neutral-100 pt-3.5">
           <div className="flex justify-between items-center">
             <span className="text-[13.5px] font-semibold text-neutral-500 tracking-normal shrink-0">모델명</span>
-            <span className="text-[13.5px] font-mono tabular-nums font-bold text-neutral-800 text-right tracking-tight">{product.name}</span>
+            <span className="text-[13.5px] font-sans tabular-nums font-bold text-neutral-800 text-right tracking-tight">{product.name}</span>
           </div>
           
           <div className="flex justify-between items-start">
             <span className="text-[13.5px] font-semibold text-neutral-500 tracking-normal shrink-0">규격</span>
-            <span className="text-[13.5px] font-mono tabular-nums text-right text-neutral-800 font-semibold leading-relaxed tracking-tight">{product.size}</span>
+            <span className="text-[13.5px] font-sans tabular-nums text-right text-neutral-800 font-semibold leading-relaxed tracking-tight">{product.size}</span>
           </div>
 
           <div className={`flex justify-between items-center ${product.isProcurement ? '' : 'invisible'}`}>
             <span className="text-[13.5px] font-semibold text-neutral-500 tracking-normal shrink-0">식별번호</span>
-            <span className="text-[13.5px] font-mono tabular-nums text-neutral-800 font-bold text-right tracking-tight">{product.identificationNo || '-'}</span>
+            <span className="text-[13.5px] font-sans tabular-nums text-neutral-800 font-bold text-right tracking-tight">{product.identificationNo || '-'}</span>
           </div>
 
           <div className="flex justify-between items-center pt-3 border-t border-neutral-100">
             <span className="text-[13.5px] font-bold text-neutral-600 tracking-normal shrink-0">판매 금액</span>
             <div className="flex items-baseline space-x-1">
-              <span className="text-[16px] sm:text-[18.5px] font-black font-mono tabular-nums text-neutral-950 tracking-tight">
+              <span className="text-[16px] sm:text-[18.5px] font-black font-sans tabular-nums text-neutral-950 tracking-tight">
                 {formatPriceNumber(product.price)}
               </span>
               <span className="text-[13.5px] font-bold text-neutral-800">원</span>
