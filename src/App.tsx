@@ -6,12 +6,14 @@ import {
   defaultBanners,
   defaultCompanyInfo,
   defaultConstructionProjects,
+  defaultInstallationCases,
   defaultHomeSectionInfo,
   defaultPageHeaders,
   defaultPopups
 } from './data/defaultData';
 import { Category, Product, Banner, CompanyInfo, Inquiry, ConstructionProject, HomeSectionInfo, PageHeaders, PopupItem } from './types';
 import { ICON_MAP, AVAILABLE_ICONS } from './utils/iconMap';
+import { sortProjectsByPeriod, sortHistoryByYear } from './utils/dateUtils';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ProductCard from './components/ProductCard';
@@ -49,7 +51,11 @@ import {
   Plus,
   Edit3,
   Play,
-  Pause
+  Pause,
+  Building2,
+  Factory,
+  Copy,
+  Check
 } from 'lucide-react';
 
 const INITIAL_MOCK_INQUIRIES: Inquiry[] = [
@@ -62,6 +68,7 @@ const INITIAL_MOCK_INQUIRIES: Inquiry[] = [
     content: '안녕하세요. 삼우종합건설 조경사업부 최민준 팀장입니다.\n용인 역북 신축 단지 조경 공사 관련하여 다듬디자인의 [컴포트 하이브리드 야외 평벤치]와 [모던 라운드 가든 조경 벤치] 총 35대를 납품받고자 합니다.\n\n1. 설치 장소: 경기도 용인시 역북동 아파트 현장 내 보행로\n2. 요청 사항: 하부 주철 프레임 색상을 다크 블랙으로 변경 제작 가능한지 여부와, 시공 전문 인력 파견을 포함한 최종 세금계산서 발행 견적서를 메일로 받아보고 싶습니다.',
     productId: 'prod-02',
     productName: '컴포트 하이브리드 야외 평벤치',
+    type: 'price',
     status: 'pending',
     createdAt: '2026-07-04'
   },
@@ -74,8 +81,31 @@ const INITIAL_MOCK_INQUIRIES: Inquiry[] = [
     content: '조경 설계 제안서 작성을 위해 [디럭스 스마트 휴게 파고라] 도면이 필요합니다.\n나라장터 식별번호를 도면 설명에 매핑해야 하여, 원본 dwg 설계 도면 파일을 메일로 발송해 주시면 감사하겠습니다.\n\n또한 미스트 분사 옵션을 추가했을 때 전기 및 설비 배선 인입 조건도 같이 가이드 문서로 보내주시면 감사하겠습니다.',
     productId: 'prod-01',
     productName: '디럭스 스마트 휴게 파고라',
+    type: 'price',
     status: 'reviewed',
     createdAt: '2026-07-02'
+  },
+  {
+    id: 'inq-3',
+    name: '김도현 과장 / 한빛건축사사무소',
+    tel: '010-3321-4567',
+    email: 'dh.kim@hanbitarch.com',
+    title: '[카탈로그 신청] 김도현 과장님의 2026 종합 카탈로그 신청의 건',
+    content: '[신청 내역]\n- 신청인: 김도현 (한빛건축사사무소)\n- 연락처: 010-3321-4567\n- 이메일: dh.kim@hanbitarch.com\n- 수령 방식: 인쇄본 우편 실물 수령 (서울특별시 강남구 테헤란로 123 한빛빌딩 4층)\n- 선택 카탈로그: 2026 다듬디자인 종합 카탈로그, 가로시설물 특화 브로셔\n- 추가 요청 사안: 신규 현장 설계 반영을 위해 지면 카탈로그 3부 우편 발송 부탁드립니다.',
+    type: 'catalog',
+    status: 'pending',
+    createdAt: '2026-08-01'
+  },
+  {
+    id: 'inq-4',
+    name: '이성민 소장 / 세종 푸르지오 관리사무소',
+    tel: '044-890-1122',
+    email: 'sm.lee@sejongpurgio.co.kr',
+    title: '[A/S 접수] 이성민 소장님의 하자 보수 접수의 건',
+    content: '[A/S 접수 정보]\n- 접수자명: 이성민 소장\n- 연락처: 044-890-1122\n- 이메일: sm.lee@sejongpurgio.co.kr\n- 설치 현장 위치: 세종특별자치시 보람동 푸르지오 102동 앞 중앙광장 휴게 파고라\n- 하자 세부 내용: 지붕 상부 태양광 LED 조명 구동부 점등 불량 및 볼트 이완 점검 요청\n- 첨부 사진 유무: 있음 (현장 증빙 자료 완료)',
+    type: 'as',
+    status: 'pending',
+    createdAt: '2026-08-05'
   }
 ];
 
@@ -99,8 +129,9 @@ export default function App() {
   const [pageHeaders, setPageHeaders] = useState<PageHeaders>(defaultPageHeaders);
   const [inquiries, setInquiries] = useState<Inquiry[]>(INITIAL_MOCK_INQUIRIES);
   const [constructionProjects, setConstructionProjects] = useState<ConstructionProject[]>(defaultConstructionProjects);
+  const [installationCases, setInstallationCases] = useState<ConstructionProject[]>(defaultInstallationCases);
   const [popups, setPopups] = useState<PopupItem[]>(defaultPopups);
-  
+
   // Dynamic Available Icons (Pictograms) State
   const [availableIcons, setAvailableIcons] = useState<{ name: string; label: string }[]>(() => {
     const cached = localStorage.getItem('dadm_available_icons');
@@ -142,7 +173,11 @@ export default function App() {
   // Admin Authorization State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
 
-  // Modal State Hooks for direct inline editing
+  // Signature products rotating states
+  const [sigIndex, setSigIndex] = useState(0);
+  const [isSigAutoPlaying, setIsSigAutoPlaying] = useState(true);
+
+  // Admin Modal States
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProductData, setEditingProductData] = useState<Product | null>(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -150,13 +185,26 @@ export default function App() {
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<ConstructionProject | null>(null);
+  const [isCaseModalOpen, setIsCaseModalOpen] = useState(false);
+  const [editingCase, setEditingCase] = useState<ConstructionProject | null>(null);
   const [isHomeSectionModalOpen, setIsHomeSectionModalOpen] = useState(false);
 
-  // Signature products rotating states
-  const [sigIndex, setSigIndex] = useState(0);
-  const [isSigAutoPlaying, setIsSigAutoPlaying] = useState(true);
+  // Synchronizers
+  const handleUpdateConstructionProjects = (updated: ConstructionProject[]) => {
+    const sorted = sortProjectsByPeriod(updated);
+    setConstructionProjects(sorted);
+    safeSetLocalStorage('dadm_construction_projects', sorted);
+    saveServerDB({ constructionProjects: sorted });
+  };
 
-  // Inline Admin Save Handlers
+  const handleUpdateInstallationCases = (updated: ConstructionProject[]) => {
+    const sorted = sortProjectsByPeriod(updated);
+    setInstallationCases(sorted);
+    safeSetLocalStorage('dadm_installation_cases', sorted);
+    saveServerDB({ installationCases: sorted });
+  };
+
+  // Construction Handlers
   const handleOpenAddProject = () => {
     setEditingProject(null);
     setIsProjectModalOpen(true);
@@ -167,12 +215,12 @@ export default function App() {
     setIsProjectModalOpen(true);
   };
 
-  const handleDeleteProjectCase = (id: string) => {
+  const handleDeleteProject = (id: string) => {
     const updated = constructionProjects.filter(p => p.id !== id);
     handleUpdateConstructionProjects(updated);
   };
 
-  const handleSaveProjectCaseDirectly = (savedProject: ConstructionProject) => {
+  const handleSaveProjectDirectly = (savedProject: ConstructionProject) => {
     const exists = constructionProjects.some(p => p.id === savedProject.id);
     let updated: ConstructionProject[];
     if (exists) {
@@ -181,6 +229,33 @@ export default function App() {
       updated = [...constructionProjects, savedProject];
     }
     handleUpdateConstructionProjects(updated);
+  };
+
+  // Installation Cases Handlers
+  const handleOpenAddCase = () => {
+    setEditingCase(null);
+    setIsCaseModalOpen(true);
+  };
+
+  const handleOpenEditCase = (caseItem: ConstructionProject) => {
+    setEditingCase(caseItem);
+    setIsCaseModalOpen(true);
+  };
+
+  const handleDeleteCase = (id: string) => {
+    const updated = installationCases.filter(c => c.id !== id);
+    handleUpdateInstallationCases(updated);
+  };
+
+  const handleSaveCaseDirectly = (savedCase: ConstructionProject) => {
+    const exists = installationCases.some(c => c.id === savedCase.id);
+    let updated: ConstructionProject[];
+    if (exists) {
+      updated = installationCases.map(c => c.id === savedCase.id ? savedCase : c);
+    } else {
+      updated = [...installationCases, savedCase];
+    }
+    handleUpdateInstallationCases(updated);
   };
 
   const handleSaveProductDirectly = (savedProduct: Product) => {
@@ -355,6 +430,23 @@ export default function App() {
       safeSetLocalStorage('dadm_construction_projects', defaultConstructionProjects);
     }
 
+    const cachedInstallation = localStorage.getItem('dadm_installation_cases');
+    if (cachedInstallation) {
+      try {
+        const parsed = JSON.parse(cachedInstallation);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setInstallationCases(parsed);
+        } else {
+          setInstallationCases(defaultInstallationCases);
+        }
+      } catch (e) {
+        setInstallationCases(defaultInstallationCases);
+      }
+    } else {
+      setInstallationCases(defaultInstallationCases);
+      safeSetLocalStorage('dadm_installation_cases', defaultInstallationCases);
+    }
+
     const cachedPopups = localStorage.getItem('dadm_popups');
     if (cachedPopups) {
       try {
@@ -432,6 +524,10 @@ export default function App() {
           setConstructionProjects(db.constructionProjects);
           safeSetLocalStorage('dadm_construction_projects', db.constructionProjects);
         }
+        if (Array.isArray(db.installationCases) && db.installationCases.length > 0) {
+          setInstallationCases(db.installationCases);
+          safeSetLocalStorage('dadm_installation_cases', db.installationCases);
+        }
         if (Array.isArray(db.popups)) {
           setPopups(db.popups);
           safeSetLocalStorage('dadm_popups', db.popups);
@@ -481,12 +577,6 @@ export default function App() {
     setProducts(updatedProds);
     safeSetLocalStorage('dadm_products', updatedProds);
     saveServerDB({ products: updatedProds });
-  };
-
-  const handleUpdateConstructionProjects = (updatedProjects: ConstructionProject[]) => {
-    setConstructionProjects(updatedProjects);
-    safeSetLocalStorage('dadm_construction_projects', updatedProjects);
-    saveServerDB({ constructionProjects: updatedProjects });
   };
 
   const handleUpdateBanners = (updatedBanners: Banner[]) => {
@@ -1102,7 +1192,7 @@ export default function App() {
                           : 'border-transparent text-neutral-400 hover:text-neutral-900'
                       }`}
                     >
-                      경영이념 / 인사말
+                      인사말
                     </button>
                     <button
                       onClick={() => setAboutTab('history')}
@@ -1161,7 +1251,7 @@ export default function App() {
                           등록된 회사 연혁이 없습니다. 관리자 모드에서 연혁을 등록해주세요.
                         </div>
                       ) : (
-                        companyInfo.historyList.map((item, idx) => (
+                        sortHistoryByYear(companyInfo.historyList).map((item, idx) => (
                           <div key={item.id || idx} className="relative">
                             <span className="absolute -left-[41px] sm:-left-[57px] top-1.5 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-neutral-950 text-white border border-white shadow-sm ring-4 ring-neutral-50 font-sans text-[10px] sm:text-xs font-black">
                               {item.yearShort || (item.year ? item.year.slice(-2) : '')}
@@ -1194,47 +1284,78 @@ export default function App() {
                 {aboutTab === 'directions' && (
                   <div className="space-y-10 animate-fade-in" id="about-tab-directions">
                     {/* CORPORATE INFORMATION TABLE */}
-                    <div className="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6">
-                      <h3 className="text-base font-bold text-neutral-950 font-sans border-b border-neutral-100 pb-4">
-                        본사 및 공장 소재지 정보
+                    <div className="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-8">
+                      <h3 className="text-lg font-extrabold text-neutral-950 font-sans border-b border-neutral-200 pb-4 flex items-center gap-2">
+                        <Building2 className="text-neutral-900" size={20} />
+                        <span>본사 및 공장 소재지 정보</span>
                       </h3>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5 text-xs sm:text-sm font-sans">
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
-                          <span className="text-neutral-400 font-medium shrink-0">상호명</span>
-                          <span className="text-neutral-900 font-bold text-right">{companyInfo.name}</span>
+                      {/* General Company Information Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-xs sm:text-sm font-sans">
+                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
+                          <span className="text-neutral-600 font-bold shrink-0">상호명</span>
+                          <span className="text-neutral-950 font-extrabold text-right">{companyInfo.name}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
-                          <span className="text-neutral-400 font-medium shrink-0">대표전화</span>
-                          <span className="text-neutral-900 font-mono font-bold text-right">{companyInfo.tel}</span>
+                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
+                          <span className="text-neutral-600 font-bold shrink-0">대표전화</span>
+                          <span className="text-neutral-950 font-mono font-extrabold text-right">{companyInfo.tel}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
-                          <span className="text-neutral-400 font-medium shrink-0">대표자</span>
-                          <span className="text-neutral-900 font-medium text-right">{companyInfo.representative}</span>
+                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
+                          <span className="text-neutral-600 font-bold shrink-0">대표자</span>
+                          <span className="text-neutral-900 font-semibold text-right">{companyInfo.representative}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
-                          <span className="text-neutral-400 font-medium shrink-0">팩스번호</span>
-                          <span className="text-neutral-900 font-mono text-right">{companyInfo.fax || '정보 없음'}</span>
+                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
+                          <span className="text-neutral-600 font-bold shrink-0">팩스번호</span>
+                          <span className="text-neutral-900 font-mono font-semibold text-right">{companyInfo.fax || '정보 없음'}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
-                          <span className="text-neutral-400 font-medium shrink-0">홈페이지</span>
+                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
+                          <span className="text-neutral-600 font-bold shrink-0">홈페이지</span>
                           <span className="text-neutral-900 font-mono text-right">
-                            <a href={companyInfo.website || 'http://www.dadmdesign.co.kr'} target="_blank" rel="noopener noreferrer" className="hover:underline text-neutral-900">
+                            <a href={companyInfo.website || 'http://www.dadmdesign.co.kr'} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600 font-bold">
                               {companyInfo.website?.replace(/^https?:\/\//, '') || 'www.dadmdesign.co.kr'}
                             </a>
                           </span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
-                          <span className="text-neutral-400 font-medium shrink-0">이메일</span>
-                          <span className="text-neutral-900 font-mono text-right">{companyInfo.email}</span>
+                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
+                          <span className="text-neutral-600 font-bold shrink-0">이메일</span>
+                          <span className="text-neutral-950 font-mono font-semibold text-right">{companyInfo.email}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5 gap-4">
-                          <span className="text-neutral-400 font-medium shrink-0">본사</span>
-                          <span className="text-neutral-900 font-medium text-right">{companyInfo.address}</span>
+                      </div>
+
+                      {/* Location Highlight Cards for High Visibility */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        {/* 1. Headquarters Callout Card */}
+                        <div className="p-5 rounded-2xl bg-neutral-900 text-white shadow-md space-y-2 border border-neutral-800 relative overflow-hidden">
+                          <div className="flex items-center justify-between">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-600 text-white text-xs font-black tracking-wide font-sans shadow-xs">
+                              <Building2 size={14} />
+                              본사 소재지
+                            </span>
+                            <span className="text-[11px] font-mono text-blue-300 bg-blue-950/60 px-2 py-0.5 rounded border border-blue-800/40">대구 본사</span>
+                          </div>
+                          <div className="pt-1">
+                            <p className="text-[11px] text-neutral-400 font-semibold mb-1">도로명 주소</p>
+                            <p className="text-base sm:text-lg font-extrabold text-white leading-snug break-all font-sans tracking-tight">
+                              {companyInfo.address}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5 gap-4">
-                          <span className="text-neutral-400 font-medium shrink-0">공장</span>
-                          <span className="text-neutral-900 font-medium text-right">{companyInfo.factoryAddress || '경북 김천 영남대로3251'}</span>
+
+                        {/* 2. Factory Callout Card */}
+                        <div className="p-5 rounded-2xl bg-neutral-900 text-white shadow-md space-y-2 border border-neutral-800 relative overflow-hidden">
+                          <div className="flex items-center justify-between">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-600 text-white text-xs font-black tracking-wide font-sans shadow-xs">
+                              <Factory size={14} />
+                              공장 소재지
+                            </span>
+                            <span className="text-[11px] font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">김천 제조공장</span>
+                          </div>
+                          <div className="pt-1">
+                            <p className="text-[11px] text-neutral-400 font-semibold mb-1">도로명 주소</p>
+                            <p className="text-base sm:text-lg font-extrabold text-white leading-snug break-all font-sans tracking-tight">
+                              {companyInfo.factoryAddress || '경북 김천 영남대로3251'}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1242,20 +1363,24 @@ export default function App() {
                     {/* Interactive Google Map Integration */}
                     <div className="bg-white text-neutral-900 relative overflow-hidden">
                       <div className="relative z-10 space-y-8">
-                        {/* Map content starts directly */}
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          {/* 1. Headquarters (본사) */}
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <h4 className="text-sm font-bold text-neutral-900 font-sans break-all">본사 : {companyInfo.address}</h4>
+                          {/* 1. Headquarters (본사) Map Card */}
+                          <div className="space-y-3">
+                            <div className="p-4 bg-neutral-900 text-white rounded-2xl shadow-md flex items-center justify-between border border-neutral-800">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
+                                  <Building2 size={16} className="text-white" />
+                                </div>
+                                <div>
+                                  <span className="text-[10px] font-extrabold text-blue-400 tracking-wider uppercase block">Headquarters</span>
+                                  <h4 className="text-sm sm:text-base font-extrabold text-white font-sans break-all">본사 : {companyInfo.address}</h4>
+                                </div>
                               </div>
                             </div>
 
                             {/* Live Interactive Map for Headquarters */}
                             <div className="rounded-2xl overflow-hidden border border-neutral-200 shadow-sm">
-                              <div className="bg-neutral-50 h-64 relative">
+                              <div className="bg-neutral-50 h-72 relative">
                                 <iframe
                                   title="Headquarters Map"
                                   width="100%"
@@ -1265,24 +1390,30 @@ export default function App() {
                                   marginHeight={0}
                                   marginWidth={0}
                                   src={`https://maps.google.com/maps?q=${encodeURIComponent(companyInfo.address)}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
-                                  className="w-full h-full border-0 grayscale-[5%] contrast-[105%]"
+                                  className="w-full h-full border-0 contrast-[105%]"
                                   allowFullScreen
                                 />
                               </div>
                             </div>
                           </div>
 
-                          {/* 2. Factory (공장) */}
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
-                                <h4 className="text-sm font-bold text-neutral-900 font-sans break-all">공장 : {companyInfo.factoryAddress || '경북 김천 영남대로3251'}</h4>
+                          {/* 2. Factory (공장) Map Card */}
+                          <div className="space-y-3">
+                            <div className="p-4 bg-neutral-900 text-white rounded-2xl shadow-md flex items-center justify-between border border-neutral-800">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0">
+                                  <Factory size={16} className="text-white" />
+                                </div>
+                                <div>
+                                  <span className="text-[10px] font-extrabold text-emerald-400 tracking-wider uppercase block">Manufacturing Plant</span>
+                                  <h4 className="text-sm sm:text-base font-extrabold text-white font-sans break-all">공장 : {companyInfo.factoryAddress || '경북 김천 영남대로3251'}</h4>
+                                </div>
                               </div>
                             </div>
 
                             {/* Live Interactive Map for Factory */}
                             <div className="rounded-2xl overflow-hidden border border-neutral-200 shadow-sm">
-                              <div className="bg-neutral-50 h-64 relative">
+                              <div className="bg-neutral-50 h-72 relative">
                                 <iframe
                                   title="Factory Map"
                                   width="100%"
@@ -1292,7 +1423,7 @@ export default function App() {
                                   marginHeight={0}
                                   marginWidth={0}
                                   src={`https://maps.google.com/maps?q=${encodeURIComponent(companyInfo.factoryAddress || '경북 김천 영남대로3251')}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
-                                  className="w-full h-full border-0 grayscale-[5%] contrast-[105%]"
+                                  className="w-full h-full border-0 contrast-[105%]"
                                   allowFullScreen
                                 />
                               </div>
@@ -1379,11 +1510,11 @@ export default function App() {
             >
               <ConstructionPortfolio
                 companyInfo={companyInfo}
-                projects={constructionProjects}
+                projects={activePage === 'cases' ? installationCases : constructionProjects}
                 isAdminLoggedIn={isAdminLoggedIn}
-                onAdd={handleOpenAddProject}
-                onEdit={handleOpenEditProject}
-                onDelete={handleDeleteProjectCase}
+                onAdd={activePage === 'cases' ? handleOpenAddCase : handleOpenAddProject}
+                onEdit={activePage === 'cases' ? handleOpenEditCase : handleOpenEditProject}
+                onDelete={activePage === 'cases' ? handleDeleteCase : handleDeleteProject}
                 onInquiryTrigger={() => {
                   setActivePage('inquiry');
                   setPrefilledProductName(activePage === 'cases' ? '시공사례 제안 상담' : '건설사업 시공 제안 상담');
@@ -1458,7 +1589,21 @@ export default function App() {
             setEditingProject(null);
           }}
           project={editingProject}
-          onSave={handleSaveProjectCaseDirectly}
+          onSave={handleSaveProjectDirectly}
+          isCases={false}
+        />
+      )}
+
+      {isCaseModalOpen && (
+        <ConstructionProjectModal
+          isOpen={isCaseModalOpen}
+          onClose={() => {
+            setIsCaseModalOpen(false);
+            setEditingCase(null);
+          }}
+          project={editingCase}
+          onSave={handleSaveCaseDirectly}
+          isCases={true}
         />
       )}
 

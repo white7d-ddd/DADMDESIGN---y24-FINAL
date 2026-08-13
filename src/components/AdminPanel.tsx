@@ -121,8 +121,18 @@ export default function AdminPanel({
   const [pictoType, setPictoType] = useState<'icon' | 'url'>('icon');
   const [customPictoUrl, setCustomPictoUrl] = useState('');
 
-  // Inquiry detail modal
+  // Inquiry detail modal & filter
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const [inquiryFilter, setInquiryFilter] = useState<'all' | 'price' | 'catalog' | 'as'>('all');
+
+  const getInquiryType = (inq: Inquiry): 'price' | 'catalog' | 'as' => {
+    if (inq.type === 'catalog' || inq.type === 'as' || inq.type === 'price') return inq.type;
+    const t = (inq.title || '').toLowerCase();
+    const c = (inq.content || '').toLowerCase();
+    if (t.includes('카탈로그') || c.includes('[카탈로그') || c.includes('선택 카탈로그')) return 'catalog';
+    if (t.includes('a/s') || t.includes('하자') || c.includes('a/s') || c.includes('하자')) return 'as';
+    return 'price';
+  };
 
   // Form Fields State - Products
   const [pName, setPName] = useState('');
@@ -161,6 +171,33 @@ export default function AdminPanel({
   const [cAboutUsText, setCAboutUsText] = useState(companyInfo.aboutUsText);
   const [cAboutUsImage, setCAboutUsImage] = useState(companyInfo.aboutUsImage || '/src/assets/images/street_bench_1783302667162.jpg');
   const [cNarajangterMarkUrl, setCNarajangterMarkUrl] = useState(companyInfo.narajangterMarkUrl || '');
+  const [cEnablePriceTab, setCEnablePriceTab] = useState(companyInfo.enablePriceTab ?? true);
+  const [cEnableCatalogTab, setCEnableCatalogTab] = useState(companyInfo.enableCatalogTab ?? true);
+  const [cEnableAsTab, setCEnableAsTab] = useState(companyInfo.enableAsTab ?? true);
+
+  useEffect(() => {
+    if (companyInfo) {
+      setCName(companyInfo.name || '');
+      setCEnglishName(companyInfo.englishName || '');
+      setCRepresentative(companyInfo.representative || '');
+      setCTel(companyInfo.tel || '');
+      setCFax(companyInfo.fax || '');
+      setCEmail(companyInfo.email || '');
+      setCAsAlertEmail(companyInfo.asAlertEmail || companyInfo.email || 'dadmdesign@naver.com');
+      setCCatalogAlertEmail(companyInfo.catalogAlertEmail || companyInfo.email || 'dadmdesign@naver.com');
+      setCAddress(companyInfo.address || '');
+      setCFactoryAddress(companyInfo.factoryAddress || '');
+      setCMailOrderNo(companyInfo.mailOrderNo || '');
+      setCWebsite(companyInfo.website || 'http://www.dadmdesign.co.kr');
+      setCAboutUsTitle(companyInfo.aboutUsTitle || '');
+      setCAboutUsText(companyInfo.aboutUsText || '');
+      setCAboutUsImage(companyInfo.aboutUsImage || '');
+      setCNarajangterMarkUrl(companyInfo.narajangterMarkUrl || '');
+      setCEnablePriceTab(companyInfo.enablePriceTab ?? true);
+      setCEnableCatalogTab(companyInfo.enableCatalogTab ?? true);
+      setCEnableAsTab(companyInfo.enableAsTab ?? true);
+    }
+  }, [companyInfo]);
 
   // Form Fields State - Home Section
   const [hSlogan, setHSlogan] = useState(homeSectionInfo.slogan);
@@ -486,6 +523,9 @@ export default function AdminPanel({
       asAlertEmail: cAsAlertEmail,
       catalogAlertEmail: cCatalogAlertEmail,
       narajangterMarkUrl: cNarajangterMarkUrl,
+      enablePriceTab: cEnablePriceTab,
+      enableCatalogTab: cEnableCatalogTab,
+      enableAsTab: cEnableAsTab,
       historyList: companyInfo.historyList,
       carDirections: companyInfo.carDirections,
       subwayDirections: companyInfo.subwayDirections,
@@ -2003,6 +2043,86 @@ export default function AdminPanel({
                   </div>
                 </div>
 
+                {/* 고객지원 항목 각각 활성화 선택 섹션 */}
+                <div className="p-5 bg-neutral-50 border border-neutral-200 rounded-2xl space-y-4">
+                  <div>
+                    <h3 className="text-sm font-bold text-neutral-900 font-sans flex items-center gap-2">
+                      <span>고객지원 메뉴 항목 활성화 선택 설정</span>
+                    </h3>
+                    <p className="text-[11px] text-neutral-500 font-sans mt-0.5">
+                      상단 고객지원 메뉴 및 문의 페이지에서 가격자료, 카탈로그 신청, A/S 하자접수 항목을 각각 활성화(노출) 또는 비활성화(숨김) 관리합니다.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                    {/* 1. 가격자료 / 견적문의 */}
+                    <div className={`p-4 rounded-xl border transition-all ${cEnablePriceTab ? 'bg-white border-blue-200 shadow-xs' : 'bg-neutral-100/70 border-neutral-200 opacity-70'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-neutral-900 font-sans">가격자료 / 견적</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cEnablePriceTab ? 'bg-blue-100 text-blue-800' : 'bg-neutral-200 text-neutral-600'}`}>
+                          {cEnablePriceTab ? '활성화 (노출)' : '비활성화 (숨김)'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-400 mb-3">월별 고시 가격자료 및 견적 문의 양식</p>
+                      <button
+                        type="button"
+                        onClick={() => setCEnablePriceTab(!cEnablePriceTab)}
+                        className={`w-full py-2 px-3 rounded-lg text-xs font-bold font-sans cursor-pointer transition-all ${
+                          cEnablePriceTab
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                            : 'bg-neutral-200 hover:bg-neutral-300 text-neutral-700'
+                        }`}
+                      >
+                        {cEnablePriceTab ? '비활성화하기' : '활성화하기'}
+                      </button>
+                    </div>
+
+                    {/* 2. 카탈로그 신청 */}
+                    <div className={`p-4 rounded-xl border transition-all ${cEnableCatalogTab ? 'bg-white border-emerald-200 shadow-xs' : 'bg-neutral-100/70 border-neutral-200 opacity-70'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-neutral-900 font-sans">카탈로그 신청</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cEnableCatalogTab ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-200 text-neutral-600'}`}>
+                          {cEnableCatalogTab ? '활성화 (노출)' : '비활성화 (숨김)'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-400 mb-3">종합 카탈로그 및 지면 브로셔 신청</p>
+                      <button
+                        type="button"
+                        onClick={() => setCEnableCatalogTab(!cEnableCatalogTab)}
+                        className={`w-full py-2 px-3 rounded-lg text-xs font-bold font-sans cursor-pointer transition-all ${
+                          cEnableCatalogTab
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                            : 'bg-neutral-200 hover:bg-neutral-300 text-neutral-700'
+                        }`}
+                      >
+                        {cEnableCatalogTab ? '비활성화하기' : '활성화하기'}
+                      </button>
+                    </div>
+
+                    {/* 3. A/S 하자접수 */}
+                    <div className={`p-4 rounded-xl border transition-all ${cEnableAsTab ? 'bg-white border-rose-200 shadow-xs' : 'bg-neutral-100/70 border-neutral-200 opacity-70'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-neutral-900 font-sans">A/S 하자접수</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cEnableAsTab ? 'bg-rose-100 text-rose-800' : 'bg-neutral-200 text-neutral-600'}`}>
+                          {cEnableAsTab ? '활성화 (노출)' : '비활성화 (숨김)'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-400 mb-3">현장 하자 보수 신청 및 사진 첨부</p>
+                      <button
+                        type="button"
+                        onClick={() => setCEnableAsTab(!cEnableAsTab)}
+                        className={`w-full py-2 px-3 rounded-lg text-xs font-bold font-sans cursor-pointer transition-all ${
+                          cEnableAsTab
+                            ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-xs'
+                            : 'bg-neutral-200 hover:bg-neutral-300 text-neutral-700'
+                        }`}
+                      >
+                        {cEnableAsTab ? '비활성화하기' : '활성화하기'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="border-t border-neutral-100 pt-6 space-y-4">
                   <h3 className="text-xs font-bold text-neutral-700 tracking-wider uppercase">소개글 편집</h3>
                   
@@ -2479,96 +2599,211 @@ export default function AdminPanel({
             )}
 
             {/* TAB 4: LIVE ONLINE INQUIRIES BOX */}
-            {activeTab === 'inquiries' && (
-              <div className="space-y-6 animate-fade-in" id="panel-inquiries-tab">
-                <div>
-                  <h2 className="text-base font-bold text-neutral-900 font-sans">
-                    온라인 신규 상담 문의 접수 내역
-                  </h2>
-                  <p className="text-[11px] text-neutral-400 font-sans mt-0.5">
-                    고객이 제품 카탈로그 또는 견적 문의폼을 통해 접수한 상담 로그 리스트입니다.
-                  </p>
-                </div>
+            {activeTab === 'inquiries' && (() => {
+              const priceInqs = inquiries.filter(i => getInquiryType(i) === 'price');
+              const catalogInqs = inquiries.filter(i => getInquiryType(i) === 'catalog');
+              const asInqs = inquiries.filter(i => getInquiryType(i) === 'as');
 
-                {inquiries.length === 0 ? (
-                  <div className="text-center py-16 border border-dashed border-neutral-200 rounded-2xl bg-neutral-50/50">
-                    <p className="text-neutral-400 text-xs font-sans">
-                      접수된 온라인 견적 문의 로그가 없습니다.
+              const filteredList = inquiries.filter(i => {
+                if (inquiryFilter === 'all') return true;
+                return getInquiryType(i) === inquiryFilter;
+              });
+
+              return (
+                <div className="space-y-6 animate-fade-in" id="panel-inquiries-tab">
+                  <div>
+                    <h2 className="text-base font-bold text-neutral-900 font-sans">
+                      고객지원 온라인 접수 & 문의 내역 관리
+                    </h2>
+                    <p className="text-[11px] text-neutral-400 font-sans mt-0.5">
+                      고객지원(가격자료/견적, 카탈로그 신청, A/S 하자접수) 항목별 접수 내역을 선택하여 즉시 확인하고 관리합니다.
                     </p>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {inquiries.map((inq) => (
-                      <div
-                        key={inq.id}
-                        className={`p-4 rounded-xl border transition-all ${
-                          inq.status === 'pending'
-                            ? 'bg-amber-50/30 border-amber-200'
-                            : 'bg-white border-neutral-200 hover:border-neutral-300'
-                        }`}
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                          <div className="flex items-center space-x-2.5">
-                            <span className={`text-[9px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
-                              inq.status === 'pending'
-                                ? 'bg-amber-500 text-white animate-pulse'
-                                : 'bg-neutral-100 text-neutral-500'
-                            }`}>
-                              {inq.status === 'pending' ? '미처리 대기' : '처리 완료'}
-                            </span>
-                            <span className="font-bold text-neutral-900 text-xs sm:text-sm">
-                              {inq.name}
-                            </span>
-                            <span className="text-neutral-400 text-[10px] font-mono">
-                              {inq.createdAt}
-                            </span>
-                          </div>
 
-                          <div className="flex items-center space-x-1">
-                            <button
-                              onClick={() => setSelectedInquiry(inq)}
-                              className="p-1.5 hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 rounded-lg transition-all cursor-pointer inline-flex text-xs"
-                              title="자세히 보기"
-                            >
-                              <Eye size={13} />
-                            </button>
-                            <button
-                              onClick={() => handleToggleInquiryStatus(inq.id)}
-                              className={`p-1.5 rounded-lg transition-all cursor-pointer inline-flex text-xs ${
-                                inq.status === 'pending'
-                                  ? 'text-amber-600 hover:bg-amber-100'
-                                  : 'text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900'
-                              }`}
-                              title={inq.status === 'pending' ? '완료 처리' : '대기 변경'}
-                            >
-                              <CheckCircle size={13} />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteInquiry(inq.id)}
-                              className="p-1.5 hover:bg-red-50 text-neutral-400 hover:text-red-600 rounded-lg transition-all cursor-pointer inline-flex text-xs"
-                              title="삭제"
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          </div>
-                        </div>
+                  {/* 고객지원 항목 선택 버튼 바 */}
+                  <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-neutral-200">
+                    <button
+                      type="button"
+                      onClick={() => setInquiryFilter('all')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold font-sans transition-all flex items-center gap-2 cursor-pointer ${
+                        inquiryFilter === 'all'
+                          ? 'bg-neutral-900 text-white shadow-sm'
+                          : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                      }`}
+                    >
+                      <span>전체 항목</span>
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                        inquiryFilter === 'all' ? 'bg-neutral-700 text-white' : 'bg-neutral-200 text-neutral-700'
+                      }`}>
+                        {inquiries.length}
+                      </span>
+                    </button>
 
-                        <div className="text-xs text-neutral-800 font-sans font-medium line-clamp-1">
-                          {inq.title}
-                        </div>
+                    <button
+                      type="button"
+                      onClick={() => setInquiryFilter('price')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold font-sans transition-all flex items-center gap-2 cursor-pointer ${
+                        inquiryFilter === 'price'
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                      }`}
+                    >
+                      <span>가격자료 / 견적문의</span>
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                        inquiryFilter === 'price' ? 'bg-blue-800 text-white' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {priceInqs.length}
+                      </span>
+                      {priceInqs.filter(i => i.status === 'pending').length > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="미처리 항목 존재" />
+                      )}
+                    </button>
 
-                        {inq.productName && (
-                          <div className="mt-1.5 text-[10px] font-sans text-neutral-400 flex items-center space-x-1">
-                            <span>연관조사제품:</span>
-                            <strong className="text-neutral-600 font-semibold underline">{inq.productName}</strong>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setInquiryFilter('catalog')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold font-sans transition-all flex items-center gap-2 cursor-pointer ${
+                        inquiryFilter === 'catalog'
+                          ? 'bg-emerald-600 text-white shadow-sm'
+                          : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                      }`}
+                    >
+                      <span>카탈로그 신청</span>
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                        inquiryFilter === 'catalog' ? 'bg-emerald-800 text-white' : 'bg-emerald-100 text-emerald-800'
+                      }`}>
+                        {catalogInqs.length}
+                      </span>
+                      {catalogInqs.filter(i => i.status === 'pending').length > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="미처리 항목 존재" />
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setInquiryFilter('as')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold font-sans transition-all flex items-center gap-2 cursor-pointer ${
+                        inquiryFilter === 'as'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
+                      }`}
+                    >
+                      <span>A/S 하자접수</span>
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                        inquiryFilter === 'as' ? 'bg-rose-800 text-white' : 'bg-rose-100 text-rose-800'
+                      }`}>
+                        {asInqs.length}
+                      </span>
+                      {asInqs.filter(i => i.status === 'pending').length > 0 && (
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="미처리 항목 존재" />
+                      )}
+                    </button>
                   </div>
-                )}
-              </div>
-            )}
+
+                  {filteredList.length === 0 ? (
+                    <div className="text-center py-16 border border-dashed border-neutral-200 rounded-2xl bg-neutral-50/50">
+                      <p className="text-neutral-400 text-xs font-sans">
+                        {inquiryFilter === 'price' ? '등록된 가격자료 / 견적문의 내역이 없습니다.' :
+                         inquiryFilter === 'catalog' ? '등록된 카탈로그 신청 내역이 없습니다.' :
+                         inquiryFilter === 'as' ? '등록된 A/S 하자접수 내역이 없습니다.' :
+                         '접수된 온라인 견적 문의 로그가 없습니다.'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {filteredList.map((inq) => {
+                        const inqCategory = getInquiryType(inq);
+                        return (
+                          <div
+                            key={inq.id}
+                            className={`p-4 rounded-xl border transition-all ${
+                              inq.status === 'pending'
+                                ? 'bg-amber-50/30 border-amber-200'
+                                : 'bg-white border-neutral-200 hover:border-neutral-300'
+                            }`}
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                              <div className="flex items-center space-x-2">
+                                {/* Category Badge */}
+                                {inqCategory === 'price' && (
+                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-blue-100 text-blue-800">
+                                    가격자료/견적
+                                  </span>
+                                )}
+                                {inqCategory === 'catalog' && (
+                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                                    카탈로그 신청
+                                  </span>
+                                )}
+                                {inqCategory === 'as' && (
+                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-rose-100 text-rose-800">
+                                    A/S 하자접수
+                                  </span>
+                                )}
+
+                                <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                                  inq.status === 'pending'
+                                    ? 'bg-amber-500 text-white animate-pulse'
+                                    : 'bg-neutral-100 text-neutral-500'
+                                }`}>
+                                  {inq.status === 'pending' ? '미처리 대기' : '처리 완료'}
+                                </span>
+                                
+                                <span className="font-bold text-neutral-900 text-xs sm:text-sm">
+                                  {inq.name}
+                                </span>
+                                <span className="text-neutral-400 text-[10px] font-mono">
+                                  {inq.createdAt}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center space-x-1">
+                                <button
+                                  onClick={() => setSelectedInquiry(inq)}
+                                  className="p-1.5 hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 rounded-lg transition-all cursor-pointer inline-flex text-xs"
+                                  title="자세히 보기"
+                                >
+                                  <Eye size={13} />
+                                </button>
+                                <button
+                                  onClick={() => handleToggleInquiryStatus(inq.id)}
+                                  className={`p-1.5 rounded-lg transition-all cursor-pointer inline-flex text-xs ${
+                                    inq.status === 'pending'
+                                      ? 'text-amber-600 hover:bg-amber-100'
+                                      : 'text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900'
+                                  }`}
+                                  title={inq.status === 'pending' ? '완료 처리' : '대기 변경'}
+                                >
+                                  <CheckCircle size={13} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteInquiry(inq.id)}
+                                  className="p-1.5 hover:bg-red-50 text-neutral-400 hover:text-red-600 rounded-lg transition-all cursor-pointer inline-flex text-xs"
+                                  title="삭제"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="text-xs text-neutral-800 font-sans font-medium line-clamp-1">
+                              {inq.title}
+                            </div>
+
+                            {inq.productName && (
+                              <div className="mt-1.5 text-[10px] font-sans text-neutral-400 flex items-center space-x-1">
+                                <span>연관조사제품:</span>
+                                <strong className="text-neutral-600 font-semibold underline">{inq.productName}</strong>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* TAB 5: BACKUP & RESTORE DATABASE JSON */}
             {activeTab === 'backup' && (
@@ -3138,14 +3373,30 @@ export default function AdminPanel({
             </div>
 
             <div className="space-y-4 text-xs font-sans">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-100">
+                  <span className="block text-[10px] text-neutral-400 font-semibold mb-1">고객지원 항목</span>
+                  <strong className={`text-xs font-bold px-2 py-0.5 rounded-md inline-block ${
+                    getInquiryType(selectedInquiry) === 'catalog'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : getInquiryType(selectedInquiry) === 'as'
+                      ? 'bg-rose-100 text-rose-800'
+                      : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {getInquiryType(selectedInquiry) === 'catalog'
+                      ? '카탈로그 신청'
+                      : getInquiryType(selectedInquiry) === 'as'
+                      ? 'A/S 하자접수'
+                      : '가격자료 / 견적'}
+                  </strong>
+                </div>
                 <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-100">
                   <span className="block text-[10px] text-neutral-400 font-semibold mb-1">성함 / 업체명</span>
-                  <strong className="text-neutral-800 text-sm">{selectedInquiry.name}</strong>
+                  <strong className="text-neutral-800 text-xs sm:text-sm">{selectedInquiry.name}</strong>
                 </div>
                 <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-100">
                   <span className="block text-[10px] text-neutral-400 font-semibold mb-1">접수 시각</span>
-                  <strong className="text-neutral-800 text-sm font-mono">{selectedInquiry.createdAt}</strong>
+                  <strong className="text-neutral-800 text-xs font-mono">{selectedInquiry.createdAt}</strong>
                 </div>
               </div>
 

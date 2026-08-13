@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { CompanyInfo, ConstructionProject, PageHeaders } from '../types';
 import EditableHeader from './EditableHeader';
 import { getDirectImageUrl } from '../utils/imageUtils';
+import { sortProjectsByPeriod } from '../utils/dateUtils';
 
 interface ConstructionPortfolioProps {
   companyInfo: CompanyInfo;
@@ -31,12 +32,21 @@ export default function ConstructionPortfolio({
   activePage = 'construction'
 }: ConstructionPortfolioProps) {
   const isCases = activePage === 'cases';
+  const displayProjects = sortProjectsByPeriod(projects);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-24" id={isCases ? 'view-cases-portfolio' : 'view-construction-portfolio'}>
       {/* Page Header */}
       <div className="text-center space-y-4 mb-16">
-        {isCases ? (
+        {pageHeaders && onUpdatePageHeaders ? (
+          <EditableHeader
+            pageKey={isCases ? "cases" : "construction"}
+            pageHeaders={pageHeaders}
+            isAdminLoggedIn={isAdminLoggedIn}
+            onUpdateHeaders={onUpdatePageHeaders}
+            centered={true}
+          />
+        ) : isCases ? (
           <>
             <span className="inline-flex items-center space-x-1 px-3 py-1 bg-neutral-100 border border-neutral-200/60 rounded-full text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold">
               <span>Installation Cases</span>
@@ -48,14 +58,6 @@ export default function ConstructionPortfolio({
               다듬디자인의 고품질 시설물 제품들이 전국 주요 현장에 설치 완료된 시공사례 모음입니다.
             </p>
           </>
-        ) : pageHeaders && onUpdatePageHeaders ? (
-          <EditableHeader
-            pageKey="construction"
-            pageHeaders={pageHeaders}
-            isAdminLoggedIn={isAdminLoggedIn}
-            onUpdateHeaders={onUpdatePageHeaders}
-            centered={true}
-          />
         ) : (
           <>
             <span className="inline-flex items-center space-x-1 px-3 py-1 bg-neutral-100 border border-neutral-200/60 rounded-full text-[10px] font-mono tracking-widest uppercase text-neutral-500 font-bold">
@@ -86,13 +88,13 @@ export default function ConstructionPortfolio({
 
       {/* Grid of Projects */}
       <div className={isCases ? "space-y-12" : "space-y-16"}>
-        {projects.length === 0 ? (
+        {displayProjects.length === 0 ? (
           <div className="text-center py-20 bg-neutral-50 rounded-3xl border border-dashed border-neutral-200">
             <p className="text-neutral-400 text-sm font-sans">등록된 사례가 없습니다.</p>
           </div>
         ) : isCases ? (
           /* 시공사례 PAGE: Photos-focused 3-Info Layout */
-          projects.map((proj, idx) => (
+          displayProjects.map((proj, idx) => (
             <motion.div
               key={proj.id}
               initial={{ opacity: 0, y: 25 }}
@@ -194,7 +196,7 @@ export default function ConstructionPortfolio({
           ))
         ) : (
           /* 건설사업 PAGE: Original Construction Portfolio Layout */
-          projects.map((proj, idx) => (
+          displayProjects.map((proj, idx) => (
             <motion.div
               key={proj.id}
               initial={{ opacity: 0, y: 30 }}

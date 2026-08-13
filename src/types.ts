@@ -60,6 +60,9 @@ export interface CompanyInfo {
   subwayDirections?: string; // 지하철 이용 안내
   busDirections?: string; // 버스 이용 안내
   narajangterMarkUrl?: string; // 나라장터 마크 이미지 URL
+  enablePriceTab?: boolean; // 가격자료 활성화 여부
+  enableCatalogTab?: boolean; // 카탈로그 신청 활성화 여부
+  enableAsTab?: boolean; // A/S 하자접수 활성화 여부
 }
 
 export interface Inquiry {
@@ -71,6 +74,7 @@ export interface Inquiry {
   content: string; // 내용
   productId?: string; // 문의 제품 ID
   productName?: string; // 문의 제품명
+  type?: 'price' | 'catalog' | 'as'; // 고객지원 항목 (가격자료/견적, 카탈로그, A/S 하자접수)
   status: 'pending' | 'reviewed'; // 처리 상태
   createdAt: string;
 }
@@ -137,6 +141,7 @@ export interface PageHeaders {
   products: PageHeaderInfo;
   inquiry: PageHeaderInfo;
   construction: PageHeaderInfo;
+  cases?: PageHeaderInfo;
   catalog: PageHeaderInfo;
   as: PageHeaderInfo;
 }

@@ -32,6 +32,11 @@ export default function Header({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<'about' | 'procurement' | 'products' | 'inquiry' | null>(null);
 
+  const showPriceTab = companyInfo?.enablePriceTab ?? true;
+  const showCatalogTab = companyInfo?.enableCatalogTab ?? true;
+  const showAsTab = companyInfo?.enableAsTab ?? true;
+  const defaultInquiryTab = showPriceTab ? 'price' : showCatalogTab ? 'catalog' : showAsTab ? 'as' : 'price';
+
   const toggleSection = (section: 'about' | 'procurement' | 'products' | 'inquiry') => {
     setExpandedSection(prev => prev === section ? null : section);
   };
@@ -100,7 +105,7 @@ export default function Header({
                   onClick={() => handleNav('about', undefined, 'philosophy')}
                   className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
-                  경영이념
+                  인사말
                 </button>
                 <button
                   onClick={() => handleNav('about', undefined, 'history')}
@@ -190,7 +195,7 @@ export default function Header({
             <div className="relative group">
               <button
                 id="nav-inquiry"
-                onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
+                onClick={() => handleNav('inquiry', undefined, undefined, defaultInquiryTab)}
                 className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-sm lg:text-base xl:text-lg tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'inquiry'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
@@ -201,26 +206,34 @@ export default function Header({
               </button>
               
               {/* Dropdown Menu */}
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <button
-                  onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
-                  className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
-                >
-                  가격자료
-                </button>
-                <button
-                  onClick={() => handleNav('inquiry', undefined, undefined, 'catalog')}
-                  className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
-                >
-                  카탈로그신청
-                </button>
-                <button
-                  onClick={() => handleNav('inquiry', undefined, undefined, 'as')}
-                  className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
-                >
-                  A/S 접수
-                </button>
-              </div>
+              {(showPriceTab || showCatalogTab || showAsTab) && (
+                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  {showPriceTab && (
+                    <button
+                      onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
+                      className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                    >
+                      가격자료
+                    </button>
+                  )}
+                  {showCatalogTab && (
+                    <button
+                      onClick={() => handleNav('inquiry', undefined, undefined, 'catalog')}
+                      className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                    >
+                      카탈로그 신청
+                    </button>
+                  )}
+                  {showAsTab && (
+                    <button
+                      onClick={() => handleNav('inquiry', undefined, undefined, 'as')}
+                      className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                    >
+                      A/S 하자접수
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* 6. 건설사업 */}
@@ -279,7 +292,7 @@ export default function Header({
                     onClick={() => handleNav('about', undefined, 'philosophy')}
                     className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                   >
-                    경영이념
+                    인사말
                   </button>
                   <button
                     onClick={() => handleNav('about', undefined, 'history')}
@@ -375,39 +388,53 @@ export default function Header({
             {/* 5. 고객지원 */}
             <div className="border-b border-gray-100 pb-2.5">
               <button
-                onClick={() => toggleSection('inquiry')}
+                onClick={() => {
+                  if (!showPriceTab && !showCatalogTab && !showAsTab) {
+                    handleNav('inquiry', undefined, undefined, defaultInquiryTab);
+                  } else {
+                    toggleSection('inquiry');
+                  }
+                }}
                 className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
                   activePage === 'inquiry' ? 'bg-neutral-50 text-neutral-950 font-black' : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >
                 <span>고객지원 (Support)</span>
-                {expandedSection === 'inquiry' ? (
-                  <ChevronUp size={16} className="text-neutral-500 stroke-[2.5px]" />
-                ) : (
-                  <ChevronDown size={16} className="text-neutral-500 stroke-[2.5px]" />
+                {(showPriceTab || showCatalogTab || showAsTab) && (
+                  expandedSection === 'inquiry' ? (
+                    <ChevronUp size={16} className="text-neutral-500 stroke-[2.5px]" />
+                  ) : (
+                    <ChevronDown size={16} className="text-neutral-500 stroke-[2.5px]" />
+                  )
                 )}
               </button>
               
-              {expandedSection === 'inquiry' && (
+              {expandedSection === 'inquiry' && (showPriceTab || showCatalogTab || showAsTab) && (
                 <div className="pl-3 pr-2 mt-1 py-1 space-y-1 bg-neutral-50/60 rounded-xl border border-neutral-100/60 animate-fade-in">
-                  <button
-                    onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
-                    className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
-                  >
-                    가격자료
-                  </button>
-                  <button
-                    onClick={() => handleNav('inquiry', undefined, undefined, 'catalog')}
-                    className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
-                  >
-                    카탈로그 신청
-                  </button>
-                  <button
-                    onClick={() => handleNav('inquiry', undefined, undefined, 'as')}
-                    className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
-                  >
-                    A/S 하자접수
-                  </button>
+                  {showPriceTab && (
+                    <button
+                      onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
+                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                    >
+                      가격자료
+                    </button>
+                  )}
+                  {showCatalogTab && (
+                    <button
+                      onClick={() => handleNav('inquiry', undefined, undefined, 'catalog')}
+                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                    >
+                      카탈로그 신청
+                    </button>
+                  )}
+                  {showAsTab && (
+                    <button
+                      onClick={() => handleNav('inquiry', undefined, undefined, 'as')}
+                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                    >
+                      A/S 하자접수
+                    </button>
+                  )}
                 </div>
               )}
             </div>

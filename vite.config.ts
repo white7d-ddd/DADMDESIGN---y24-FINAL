@@ -4,8 +4,9 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
+  const isGithubPages = process.env.GITHUB_PAGES === 'true';
   const repoName = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : '';
-  const base = repoName ? `/${repoName}/` : (process.env.GITHUB_ACTIONS ? '/dadm/' : './');
+  const base = isGithubPages ? (repoName ? `/${repoName}/` : './') : '/';
 
   return {
     base,

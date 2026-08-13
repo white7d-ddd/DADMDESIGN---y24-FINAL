@@ -83,6 +83,24 @@ export default function InquiryForm({
   const [lastCatalogMailto, setLastCatalogMailto] = useState('');
   const [isCatalogSubmitted, setIsCatalogSubmitted] = useState(false);
 
+  const showPriceTab = companyInfo?.enablePriceTab ?? true;
+  const showCatalogTab = companyInfo?.enableCatalogTab ?? true;
+  const showAsTab = companyInfo?.enableAsTab ?? true;
+
+  // Auto-redirect if active tab is disabled
+  useEffect(() => {
+    if (activeTab === 'price' && !showPriceTab) {
+      if (showCatalogTab) setActiveTab('catalog');
+      else if (showAsTab) setActiveTab('as');
+    } else if (activeTab === 'catalog' && !showCatalogTab) {
+      if (showPriceTab) setActiveTab('price');
+      else if (showAsTab) setActiveTab('as');
+    } else if (activeTab === 'as' && !showAsTab) {
+      if (showPriceTab) setActiveTab('price');
+      else if (showCatalogTab) setActiveTab('catalog');
+    }
+  }, [activeTab, showPriceTab, showCatalogTab, showAsTab]);
+
   const resetFormState = () => {
     setSubmitted(false);
     setIsAsSubmitted(false);
@@ -147,7 +165,8 @@ export default function InquiryForm({
       tel: catTel,
       email: catEmail,
       title: `[카탈로그 신청] ${catName}님의 카탈로그 신청의 건`,
-      content: compiledContent
+      content: compiledContent,
+      type: 'catalog'
     });
 
     const catalogTargetEmail = companyInfo?.catalogAlertEmail || companyInfo?.email || 'dadmdesign@naver.com';
@@ -213,7 +232,8 @@ ${catContent || '없음'}
       tel: asTel,
       email: asEmail,
       title: `[A/S 접수] ${asName}님의 하자 보수 접수의 건`,
-      content: compiledContent
+      content: compiledContent,
+      type: 'as'
     });
 
     const asTargetEmail = companyInfo?.asAlertEmail || companyInfo?.email || 'dadmdesign@naver.com';
@@ -445,40 +465,57 @@ ${asContent}
         </div>
 
         {/* Tab Switcher - Order: Price -> Catalog -> A/S */}
-        <div className="flex justify-center border-b border-neutral-200/80 mb-12 max-w-2xl mx-auto" id="inquiry-tab-switcher">
-          <div className="flex space-x-2 sm:space-x-8">
-            <button
-              onClick={() => { setActiveTab('price'); resetFormState(); }}
-              className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
-                activeTab === 'price'
-                  ? 'border-neutral-950 text-neutral-950 scale-105'
-                  : 'border-transparent text-neutral-400 hover:text-neutral-900'
-              }`}
-            >
-              가격자료
-            </button>
-            <button
-              onClick={() => { setActiveTab('catalog'); resetFormState(); }}
-              className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
-                activeTab === 'catalog'
-                  ? 'border-neutral-950 text-neutral-950 scale-105'
-                  : 'border-transparent text-neutral-400 hover:text-neutral-900'
-              }`}
-            >
-              카탈로그 신청
-            </button>
-            <button
-              onClick={() => { setActiveTab('as'); resetFormState(); }}
-              className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
-                activeTab === 'as'
-                  ? 'border-neutral-950 text-neutral-950 scale-105'
-                  : 'border-transparent text-neutral-400 hover:text-neutral-900'
-              }`}
-            >
-              A/S 하자접수
-            </button>
+        {(!showPriceTab && !showCatalogTab && !showAsTab) ? (
+          <div className="max-w-xl mx-auto p-6 bg-amber-50 border border-amber-200 rounded-2xl text-center mb-12">
+            <p className="text-xs sm:text-sm font-bold text-amber-900 font-sans">
+              현재 모든 온라인 고객지원 접수가 비활성화되어 있습니다.
+            </p>
+            <p className="text-xs text-amber-700 font-sans mt-1">
+              상담이 필요하신 경우 대표전화({companyInfo?.tel || '053-327-0015'}) 또는 대표 이메일({companyInfo?.email || 'dadmdesign@naver.com'})로 문의해 주시기 바랍니다.
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="flex justify-center border-b border-neutral-200/80 mb-12 max-w-2xl mx-auto" id="inquiry-tab-switcher">
+            <div className="flex space-x-2 sm:space-x-8">
+              {showPriceTab && (
+                <button
+                  onClick={() => { setActiveTab('price'); resetFormState(); }}
+                  className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
+                    activeTab === 'price'
+                      ? 'border-neutral-950 text-neutral-950 scale-105'
+                      : 'border-transparent text-neutral-400 hover:text-neutral-900'
+                  }`}
+                >
+                  가격자료
+                </button>
+              )}
+              {showCatalogTab && (
+                <button
+                  onClick={() => { setActiveTab('catalog'); resetFormState(); }}
+                  className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
+                    activeTab === 'catalog'
+                      ? 'border-neutral-950 text-neutral-950 scale-105'
+                      : 'border-transparent text-neutral-400 hover:text-neutral-900'
+                  }`}
+                >
+                  카탈로그 신청
+                </button>
+              )}
+              {showAsTab && (
+                <button
+                  onClick={() => { setActiveTab('as'); resetFormState(); }}
+                  className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
+                    activeTab === 'as'
+                      ? 'border-neutral-950 text-neutral-950 scale-105'
+                      : 'border-transparent text-neutral-400 hover:text-neutral-900'
+                  }`}
+                >
+                  A/S 하자접수
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {submitted ? (
           /* Submission success state */

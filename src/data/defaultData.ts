@@ -91,6 +91,9 @@ export const defaultCompanyInfo: CompanyInfo = {
   asAlertEmail: 'dadmdesign@naver.com',
   catalogAlertEmail: 'dadmdesign@naver.com',
   narajangterMarkUrl: '',
+  enablePriceTab: true,
+  enableCatalogTab: true,
+  enableAsTab: true,
   historyList: [
     {
       id: 'h-1',
@@ -363,6 +366,42 @@ export const defaultPriceData = [
   }
 ];
 
+export const defaultInstallationCases: ConstructionProject[] = [
+  {
+    id: 'case-1',
+    title: '디럭스 스마트 휴게 파고라',
+    location: '대구 수성구 중앙호수공원 산책로',
+    period: '2026.03.15',
+    items: 'W4500 x D3200 x H2900 (mm)',
+    description: '공원 수변 산책로에 태양광 LED 조명이 내장된 스마트 파고라 시설물을 단독 직영 출하 및 매립식 앙카 설치한 사례입니다.',
+    image: '/src/assets/images/street_pergola_1783302650051.jpg',
+    image2: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+    tag: '파고라 설치'
+  },
+  {
+    id: 'case-2',
+    title: '컴포트 하이브리드 야외 평벤치',
+    location: '용인 역북 푸르지오 단지 내 중앙광장',
+    period: '2026.04.10',
+    items: 'W1800 x D450 x H420 (mm)',
+    description: '아파트 단지 산책로변에 최고급 이페 천연목재와 하드우드 벤치 총 20대를 연속 배열 시공한 납품 사례입니다.',
+    image: '/src/assets/images/street_bench_1783302667162.jpg',
+    image2: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80',
+    tag: '벤치 설치'
+  },
+  {
+    id: 'case-3',
+    title: '모던 에코 분리수거함 및 플랜터 쉼터',
+    location: '서울 상암 하늘공원 진입로',
+    period: '2025.11.20',
+    items: 'W2400 x D1100 x H1300 (mm)',
+    description: '하늘공원 광장에 대용량 트윈 분리수거함과 수목 보호용 스틸 플랜터를 패키지로 배치 시공 완료하였습니다.',
+    image: '/src/assets/images/street_planter_1783302680596.jpg',
+    image2: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80',
+    tag: '시설물 설치'
+  }
+];
+
 export const defaultConstructionProjects: ConstructionProject[] = [
   {
     id: 'proj-1',
@@ -444,6 +483,11 @@ export const defaultPageHeaders: PageHeaders = {
     slogan: 'Construction Portfolio',
     title: '건설사업 및 시공 실적',
     description: '다듬디자인의 엄격한 자재 선별과 완벽한 밀착 직영 시공팀이 완성한 격조 높은 조경 시설 현장들입니다.'
+  },
+  cases: {
+    slogan: 'Installation Cases',
+    title: '시공사례',
+    description: '다듬디자인의 고품질 조경시설물 제품들이 전국 주요 현장에 설치 완료된 시공사례 모음입니다.'
   },
   catalog: {
     slogan: '',

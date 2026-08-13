@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Trash2, Edit2, Layers, Image, Building, ShieldCheck, AlertTriangle, ArrowUp, ArrowDown, MapPin, Calendar, Upload } from 'lucide-react';
 import { Product, Category, Banner, CompanyInfo, ConstructionProject, HomeSectionInfo } from '../types';
 import { getDirectImageUrl, convertSynologyToDirectUrl } from '../utils/imageUtils';
+import { sortHistoryByYear } from '../utils/dateUtils';
 import { ICON_MAP, AVAILABLE_ICONS } from '../utils/iconMap';
 
 // ==========================================
@@ -1086,6 +1087,10 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
   const [cSubwayDirections, setCSubwayDirections] = useState('');
   const [cBusDirections, setCBusDirections] = useState('');
 
+  const [cEnablePriceTab, setCEnablePriceTab] = useState(true);
+  const [cEnableCatalogTab, setCEnableCatalogTab] = useState(true);
+  const [cEnableAsTab, setCEnableAsTab] = useState(true);
+
   const [activeSubTab, setActiveSubTab] = useState<'basic' | 'philosophy' | 'history' | 'directions'>('basic');
 
   useEffect(() => {
@@ -1107,6 +1112,10 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
       setCAboutUsImage(companyInfo.aboutUsImage || '/src/assets/images/street_bench_1783302667162.jpg');
       setCNarajangterMarkUrl(companyInfo.narajangterMarkUrl || '');
       setCMapAddress(companyInfo.mapAddress || '');
+
+      setCEnablePriceTab(companyInfo.enablePriceTab ?? true);
+      setCEnableCatalogTab(companyInfo.enableCatalogTab ?? true);
+      setCEnableAsTab(companyInfo.enableAsTab ?? true);
 
       setCHistoryList(companyInfo.historyList ? JSON.parse(JSON.stringify(companyInfo.historyList)) : []);
       setCCarDirections(companyInfo.carDirections || '');
@@ -1136,7 +1145,10 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
       asAlertEmail: cAsAlertEmail.trim(),
       catalogAlertEmail: cCatalogAlertEmail.trim(),
       narajangterMarkUrl: cNarajangterMarkUrl.trim(),
-      historyList: cHistoryList,
+      enablePriceTab: cEnablePriceTab,
+      enableCatalogTab: cEnableCatalogTab,
+      enableAsTab: cEnableAsTab,
+      historyList: sortHistoryByYear(cHistoryList),
       carDirections: cCarDirections.trim(),
       subwayDirections: cSubwayDirections.trim(),
       busDirections: cBusDirections.trim()
@@ -1165,7 +1177,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                 회사 정보 및 소개글 통합 제어소
               </h2>
               <p className="text-xs text-neutral-400 font-sans mt-1">
-                회사의 주소, 경영이념, 연혁 및 오시는 길 등 모든 소개 데이터를 팝업 형태로 즉각 수정합니다.
+                회사의 주소, 인사말, 연혁 및 오시는 길 등 모든 소개 데이터를 팝업 형태로 즉각 수정합니다.
               </p>
             </div>
             <button
@@ -1194,7 +1206,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                 activeSubTab === 'philosophy' ? 'border-neutral-950 text-neutral-950' : 'border-transparent text-neutral-400 hover:text-neutral-700'
               }`}
             >
-              경영이념 & 인사말
+              인사말
             </button>
             <button
               type="button"
@@ -1299,6 +1311,48 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                     </div>
                   </div>
 
+                  {/* 고객지원 메뉴 항목 활성화 선택 */}
+                  <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-2xl space-y-3">
+                    <div>
+                      <h4 className="text-xs font-bold text-neutral-900 font-sans">고객지원 메뉴 항목 활성화 선택</h4>
+                      <p className="text-[11px] text-neutral-500 font-sans mt-0.5">
+                        상단 메뉴 및 고객지원 페이지에서 노출할 항목을 선택하세요.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <label className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${cEnablePriceTab ? 'bg-white border-blue-200 text-blue-900 font-bold' : 'bg-neutral-100 border-neutral-200 text-neutral-500'}`}>
+                        <span className="text-xs">가격자료</span>
+                        <input
+                          type="checkbox"
+                          checked={cEnablePriceTab}
+                          onChange={(e) => setCEnablePriceTab(e.target.checked)}
+                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                        />
+                      </label>
+
+                      <label className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${cEnableCatalogTab ? 'bg-white border-emerald-200 text-emerald-900 font-bold' : 'bg-neutral-100 border-neutral-200 text-neutral-500'}`}>
+                        <span className="text-xs">카탈로그 신청</span>
+                        <input
+                          type="checkbox"
+                          checked={cEnableCatalogTab}
+                          onChange={(e) => setCEnableCatalogTab(e.target.checked)}
+                          className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                        />
+                      </label>
+
+                      <label className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${cEnableAsTab ? 'bg-white border-rose-200 text-rose-900 font-bold' : 'bg-neutral-100 border-neutral-200 text-neutral-500'}`}>
+                        <span className="text-xs">A/S 하자접수</span>
+                        <input
+                          type="checkbox"
+                          checked={cEnableAsTab}
+                          onChange={(e) => setCEnableAsTab(e.target.checked)}
+                          className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
                   <div className="space-y-4 pt-2 border-t border-neutral-100">
                     <div>
                       <label className="block text-xs font-bold text-neutral-500 mb-1.5">본사 소재지 주소</label>
@@ -1339,7 +1393,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
               {activeSubTab === 'philosophy' && (
                 <div className="space-y-5 animate-fade-in">
                   <div>
-                    <label className="block text-xs font-bold text-neutral-500 mb-1.5">경영이념 / 인사말 캐치프레이즈 타이틀</label>
+                    <label className="block text-xs font-bold text-neutral-500 mb-1.5">인사말 캐치프레이즈 타이틀</label>
                     <input
                       type="text"
                       value={cAboutUsTitle}
@@ -1508,7 +1562,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                       type="button"
                       onClick={() => {
                         const newYear = new Date().getFullYear().toString();
-                        setCHistoryList([
+                        const updated = sortHistoryByYear([
                           {
                             id: 'h-' + Date.now(),
                             year: newYear,
@@ -1519,6 +1573,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                           },
                           ...cHistoryList
                         ]);
+                        setCHistoryList(updated);
                       }}
                       className="bg-neutral-900 hover:bg-neutral-950 text-white text-[10px] font-sans font-extrabold px-3 py-2 rounded-lg flex items-center gap-1 cursor-pointer transition-all hover:scale-105"
                     >
@@ -1716,9 +1771,10 @@ interface ConstructionProjectModalProps {
   onClose: () => void;
   project: ConstructionProject | null;
   onSave: (savedProject: ConstructionProject) => void;
+  isCases?: boolean;
 }
 
-export function ConstructionProjectModal({ isOpen, onClose, project, onSave }: ConstructionProjectModalProps) {
+export function ConstructionProjectModal({ isOpen, onClose, project, onSave, isCases = false }: ConstructionProjectModalProps) {
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
   const [period, setPeriod] = useState('');
@@ -1726,7 +1782,7 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave }: C
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('/src/assets/images/street_bench_1783302667162.jpg');
   const [image2, setImage2] = useState('');
-  const [tag, setTag] = useState('공동주택 조경');
+  const [tag, setTag] = useState(isCases ? '시설물 설치' : '공동주택 조경');
 
   useEffect(() => {
     if (project) {
@@ -1737,7 +1793,7 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave }: C
       setDescription(project.description || '');
       setImage(project.image || '');
       setImage2(project.image2 || project.image || '');
-      setTag(project.tag || '시공사례');
+      setTag(project.tag || (isCases ? '시설물 설치' : '공동주택 조경'));
     } else {
       setTitle('');
       setLocation('');
@@ -1746,21 +1802,21 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave }: C
       setDescription('');
       setImage('/src/assets/images/street_bench_1783302667162.jpg');
       setImage2('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80');
-      setTag('시공사례');
+      setTag(isCases ? '시설물 설치' : '공동주택 조경');
     }
-  }, [project, isOpen]);
+  }, [project, isOpen, isCases]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !location.trim() || !items.trim()) {
-      alert('제품명, 현장명, 규격은 필수 입력값입니다.');
+      alert(isCases ? '제품명, 설치 현장명, 규격은 필수 입력값입니다.' : '사업/공사명, 현장 위치, 규격/내역은 필수 입력값입니다.');
       return;
     }
 
     const saved: ConstructionProject = {
-      id: project ? project.id : `proj-${Date.now()}`,
+      id: project ? project.id : (isCases ? `case-${Date.now()}` : `proj-${Date.now()}`),
       title: title.trim(),
       location: location.trim(),
       period: period.trim() || `${new Date().getFullYear()}.${String(new Date().getMonth()+1).padStart(2, '0')}`,
@@ -1768,7 +1824,7 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave }: C
       description: description.trim(),
       image: image.trim() || '/src/assets/images/street_bench_1783302667162.jpg',
       image2: image2.trim() || image.trim(),
-      tag: tag.trim() || '시공사례'
+      tag: tag.trim() || (isCases ? '시설물 설치' : '공동주택 조경')
     };
 
     onSave(saved);
@@ -1792,9 +1848,15 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave }: C
               </div>
               <div>
                 <h2 className="text-base font-black text-neutral-900 font-sans tracking-tight">
-                  {project ? '시공 사례 실적 수정' : '새 시공 사례 실적 추가'}
+                  {isCases 
+                    ? (project ? '조경시설물 시공사례 정보 수정' : '새 조경시설물 시공사례 등록')
+                    : (project ? '건설사업 시공실적 정보 수정' : '새 건설사업 시공실적 등록')}
                 </h2>
-                <p className="text-[10px] text-neutral-400 font-sans mt-0.5">제품명, 현장명, 규격 정보 및 2장의 시공 사진 등록</p>
+                <p className="text-[10px] text-neutral-400 font-sans mt-0.5">
+                  {isCases 
+                    ? '조경시설물 제품명, 설치 현장명, 규격 정보 및 2장의 시공 사진 등록'
+                    : '조경공사 사업명, 현장 위치, 공사 내역 및 2장의 현장 사진 등록'}
+                </p>
               </div>
             </div>
             <button
