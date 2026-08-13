@@ -89,34 +89,34 @@ export default function ProductCard({ product, onClick, isAdminLoggedIn = false,
       <div className="p-5 flex flex-col flex-grow">
         
         {/* Title */}
-        <h3 className="text-base font-bold text-neutral-900 font-sans tracking-tight mb-4 group-hover:text-neutral-700 transition-colors">
+        <h3 className="text-[17.5px] font-bold text-neutral-900 font-sans tracking-tight mb-4 group-hover:text-neutral-700 transition-colors">
           {product.name}
         </h3>
 
         {/* Specifications Grid */}
-        <div className="space-y-2.5 text-xs font-sans text-neutral-600 flex-grow border-t border-neutral-100 pt-3">
+        <div className="space-y-3 text-[13.5px] font-sans text-neutral-600 flex-grow border-t border-neutral-100 pt-3.5">
           <div className="flex justify-between items-center">
-            <span className="text-xs font-medium text-neutral-400 tracking-normal shrink-0">모델명</span>
-            <span className="text-xs font-mono font-semibold text-neutral-800 text-right">{product.name}</span>
+            <span className="text-[13.5px] font-semibold text-neutral-500 tracking-normal shrink-0">모델명</span>
+            <span className="text-[13.5px] font-mono tabular-nums font-bold text-neutral-800 text-right tracking-tight">{product.name}</span>
           </div>
           
           <div className="flex justify-between items-start">
-            <span className="text-xs font-medium text-neutral-400 tracking-normal shrink-0">규격</span>
-            <span className="text-xs text-right text-neutral-700 font-medium leading-relaxed">{product.size}</span>
+            <span className="text-[13.5px] font-semibold text-neutral-500 tracking-normal shrink-0">규격</span>
+            <span className="text-[13.5px] font-mono tabular-nums text-right text-neutral-800 font-semibold leading-relaxed tracking-tight">{product.size}</span>
           </div>
 
           <div className={`flex justify-between items-center ${product.isProcurement ? '' : 'invisible'}`}>
-            <span className="text-xs font-medium text-neutral-400 tracking-normal shrink-0">식별번호</span>
-            <span className="text-xs font-mono text-neutral-700 font-medium text-right">{product.identificationNo || '-'}</span>
+            <span className="text-[13.5px] font-semibold text-neutral-500 tracking-normal shrink-0">식별번호</span>
+            <span className="text-[13.5px] font-mono tabular-nums text-neutral-800 font-bold text-right tracking-tight">{product.identificationNo || '-'}</span>
           </div>
 
-          <div className="flex justify-between items-center pt-2.5 border-t border-neutral-100">
-            <span className="text-xs font-medium text-neutral-400 tracking-normal shrink-0">판매 금액</span>
-            <div className="flex items-baseline space-x-0.5">
-              <span className="text-sm sm:text-base font-extrabold font-mono text-neutral-950 tracking-tight">
+          <div className="flex justify-between items-center pt-3 border-t border-neutral-100">
+            <span className="text-[13.5px] font-bold text-neutral-600 tracking-normal shrink-0">판매 금액</span>
+            <div className="flex items-baseline space-x-1">
+              <span className="text-[16px] sm:text-[18.5px] font-black font-mono tabular-nums text-neutral-950 tracking-tight">
                 {formatPriceNumber(product.price)}
               </span>
-              <span className="text-xs font-medium text-neutral-700">원</span>
+              <span className="text-[13.5px] font-bold text-neutral-800">원</span>
             </div>
           </div>
         </div>

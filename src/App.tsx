@@ -51,11 +51,7 @@ import {
   Plus,
   Edit3,
   Play,
-  Pause,
-  Building2,
-  Factory,
-  Copy,
-  Check
+  Pause
 } from 'lucide-react';
 
 const INITIAL_MOCK_INQUIRIES: Inquiry[] = [
@@ -1284,78 +1280,47 @@ export default function App() {
                 {aboutTab === 'directions' && (
                   <div className="space-y-10 animate-fade-in" id="about-tab-directions">
                     {/* CORPORATE INFORMATION TABLE */}
-                    <div className="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-8">
-                      <h3 className="text-lg font-extrabold text-neutral-950 font-sans border-b border-neutral-200 pb-4 flex items-center gap-2">
-                        <Building2 className="text-neutral-900" size={20} />
-                        <span>본사 및 공장 소재지 정보</span>
+                    <div className="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6">
+                      <h3 className="text-base font-bold text-neutral-950 font-sans border-b border-neutral-100 pb-4">
+                        본사 및 공장 소재지 정보
                       </h3>
 
-                      {/* General Company Information Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-xs sm:text-sm font-sans">
-                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
-                          <span className="text-neutral-600 font-bold shrink-0">상호명</span>
-                          <span className="text-neutral-950 font-extrabold text-right">{companyInfo.name}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5 text-xs sm:text-sm font-sans">
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                          <span className="text-neutral-400 font-medium shrink-0">상호명</span>
+                          <span className="text-neutral-900 font-bold text-right">{companyInfo.name}</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
-                          <span className="text-neutral-600 font-bold shrink-0">대표전화</span>
-                          <span className="text-neutral-950 font-mono font-extrabold text-right">{companyInfo.tel}</span>
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                          <span className="text-neutral-400 font-medium shrink-0">대표전화</span>
+                          <span className="text-neutral-900 font-mono font-bold text-right">{companyInfo.tel}</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
-                          <span className="text-neutral-600 font-bold shrink-0">대표자</span>
-                          <span className="text-neutral-900 font-semibold text-right">{companyInfo.representative}</span>
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                          <span className="text-neutral-400 font-medium shrink-0">대표자</span>
+                          <span className="text-neutral-900 font-medium text-right">{companyInfo.representative}</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
-                          <span className="text-neutral-600 font-bold shrink-0">팩스번호</span>
-                          <span className="text-neutral-900 font-mono font-semibold text-right">{companyInfo.fax || '정보 없음'}</span>
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                          <span className="text-neutral-400 font-medium shrink-0">팩스번호</span>
+                          <span className="text-neutral-900 font-mono text-right">{companyInfo.fax || '정보 없음'}</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
-                          <span className="text-neutral-600 font-bold shrink-0">홈페이지</span>
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                          <span className="text-neutral-400 font-medium shrink-0">홈페이지</span>
                           <span className="text-neutral-900 font-mono text-right">
-                            <a href={companyInfo.website || 'http://www.dadmdesign.co.kr'} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600 font-bold">
+                            <a href={companyInfo.website || 'http://www.dadmdesign.co.kr'} target="_blank" rel="noopener noreferrer" className="hover:underline text-neutral-900">
                               {companyInfo.website?.replace(/^https?:\/\//, '') || 'www.dadmdesign.co.kr'}
                             </a>
                           </span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
-                          <span className="text-neutral-600 font-bold shrink-0">이메일</span>
-                          <span className="text-neutral-950 font-mono font-semibold text-right">{companyInfo.email}</span>
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                          <span className="text-neutral-400 font-medium shrink-0">이메일</span>
+                          <span className="text-neutral-900 font-mono text-right">{companyInfo.email}</span>
                         </div>
-                      </div>
-
-                      {/* Location Highlight Cards for High Visibility */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                        {/* 1. Headquarters Callout Card */}
-                        <div className="p-5 rounded-2xl bg-neutral-900 text-white shadow-md space-y-2 border border-neutral-800 relative overflow-hidden">
-                          <div className="flex items-center justify-between">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-600 text-white text-xs font-black tracking-wide font-sans shadow-xs">
-                              <Building2 size={14} />
-                              본사 소재지
-                            </span>
-                            <span className="text-[11px] font-mono text-blue-300 bg-blue-950/60 px-2 py-0.5 rounded border border-blue-800/40">대구 본사</span>
-                          </div>
-                          <div className="pt-1">
-                            <p className="text-[11px] text-neutral-400 font-semibold mb-1">도로명 주소</p>
-                            <p className="text-base sm:text-lg font-extrabold text-white leading-snug break-all font-sans tracking-tight">
-                              {companyInfo.address}
-                            </p>
-                          </div>
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5 gap-4">
+                          <span className="text-neutral-400 font-medium shrink-0">본사</span>
+                          <span className="text-neutral-900 font-medium text-right">{companyInfo.address}</span>
                         </div>
-
-                        {/* 2. Factory Callout Card */}
-                        <div className="p-5 rounded-2xl bg-neutral-900 text-white shadow-md space-y-2 border border-neutral-800 relative overflow-hidden">
-                          <div className="flex items-center justify-between">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-600 text-white text-xs font-black tracking-wide font-sans shadow-xs">
-                              <Factory size={14} />
-                              공장 소재지
-                            </span>
-                            <span className="text-[11px] font-mono text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">김천 제조공장</span>
-                          </div>
-                          <div className="pt-1">
-                            <p className="text-[11px] text-neutral-400 font-semibold mb-1">도로명 주소</p>
-                            <p className="text-base sm:text-lg font-extrabold text-white leading-snug break-all font-sans tracking-tight">
-                              {companyInfo.factoryAddress || '경북 김천 영남대로3251'}
-                            </p>
-                          </div>
+                        <div className="flex justify-between border-b border-neutral-50 pb-2.5 gap-4">
+                          <span className="text-neutral-400 font-medium shrink-0">공장</span>
+                          <span className="text-neutral-900 font-medium text-right">{companyInfo.factoryAddress || '경북 김천 영남대로3251'}</span>
                         </div>
                       </div>
                     </div>
@@ -1363,24 +1328,20 @@ export default function App() {
                     {/* Interactive Google Map Integration */}
                     <div className="bg-white text-neutral-900 relative overflow-hidden">
                       <div className="relative z-10 space-y-8">
+                        {/* Map content starts directly */}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          {/* 1. Headquarters (본사) Map Card */}
-                          <div className="space-y-3">
-                            <div className="p-4 bg-neutral-900 text-white rounded-2xl shadow-md flex items-center justify-between border border-neutral-800">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
-                                  <Building2 size={16} className="text-white" />
-                                </div>
-                                <div>
-                                  <span className="text-[10px] font-extrabold text-blue-400 tracking-wider uppercase block">Headquarters</span>
-                                  <h4 className="text-sm sm:text-base font-extrabold text-white font-sans break-all">본사 : {companyInfo.address}</h4>
-                                </div>
+                          {/* 1. Headquarters (본사) */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <h4 className="text-sm font-bold text-neutral-900 font-sans break-all">본사 : {companyInfo.address}</h4>
                               </div>
                             </div>
 
                             {/* Live Interactive Map for Headquarters */}
                             <div className="rounded-2xl overflow-hidden border border-neutral-200 shadow-sm">
-                              <div className="bg-neutral-50 h-72 relative">
+                              <div className="bg-neutral-50 h-64 relative">
                                 <iframe
                                   title="Headquarters Map"
                                   width="100%"
@@ -1390,30 +1351,24 @@ export default function App() {
                                   marginHeight={0}
                                   marginWidth={0}
                                   src={`https://maps.google.com/maps?q=${encodeURIComponent(companyInfo.address)}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
-                                  className="w-full h-full border-0 contrast-[105%]"
+                                  className="w-full h-full border-0 grayscale-[5%] contrast-[105%]"
                                   allowFullScreen
                                 />
                               </div>
                             </div>
                           </div>
 
-                          {/* 2. Factory (공장) Map Card */}
-                          <div className="space-y-3">
-                            <div className="p-4 bg-neutral-900 text-white rounded-2xl shadow-md flex items-center justify-between border border-neutral-800">
-                              <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0">
-                                  <Factory size={16} className="text-white" />
-                                </div>
-                                <div>
-                                  <span className="text-[10px] font-extrabold text-emerald-400 tracking-wider uppercase block">Manufacturing Plant</span>
-                                  <h4 className="text-sm sm:text-base font-extrabold text-white font-sans break-all">공장 : {companyInfo.factoryAddress || '경북 김천 영남대로3251'}</h4>
-                                </div>
+                          {/* 2. Factory (공장) */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <h4 className="text-sm font-bold text-neutral-900 font-sans break-all">공장 : {companyInfo.factoryAddress || '경북 김천 영남대로3251'}</h4>
                               </div>
                             </div>
 
                             {/* Live Interactive Map for Factory */}
                             <div className="rounded-2xl overflow-hidden border border-neutral-200 shadow-sm">
-                              <div className="bg-neutral-50 h-72 relative">
+                              <div className="bg-neutral-50 h-64 relative">
                                 <iframe
                                   title="Factory Map"
                                   width="100%"
@@ -1423,7 +1378,7 @@ export default function App() {
                                   marginHeight={0}
                                   marginWidth={0}
                                   src={`https://maps.google.com/maps?q=${encodeURIComponent(companyInfo.factoryAddress || '경북 김천 영남대로3251')}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
-                                  className="w-full h-full border-0 contrast-[105%]"
+                                  className="w-full h-full border-0 grayscale-[5%] contrast-[105%]"
                                   allowFullScreen
                                 />
                               </div>

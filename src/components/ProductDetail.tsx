@@ -168,48 +168,48 @@ export default function ProductDetail({
                 <table className="w-full text-left border-collapse font-sans">
                   <tbody>
                     <tr className="border-b border-neutral-200/80">
-                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-sm sm:text-base border-r border-neutral-200/80">
+                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-[15.5px] sm:text-[17.5px] border-r border-neutral-200/80">
                         <span className="block w-full" style={{ textAlignLast: 'justify', textJustify: 'inter-character' }}>
                           모델명
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-neutral-950 font-mono font-bold text-sm sm:text-base">{product.name}</td>
+                      <td className="px-4 py-3.5 text-neutral-950 font-mono tabular-nums font-bold text-[15.5px] sm:text-[17.5px] tracking-tight">{product.name}</td>
                     </tr>
                     {product.isProcurement && (
                       <tr className="border-b border-neutral-200/80">
-                        <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-sm sm:text-base border-r border-neutral-200/80">
+                        <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-[15.5px] sm:text-[17.5px] border-r border-neutral-200/80">
                           <span className="block w-full" style={{ textAlignLast: 'justify', textJustify: 'inter-character' }}>
                             식별번호
                           </span>
                         </td>
-                        <td className="px-4 py-3.5 text-neutral-950 font-mono font-bold text-sm sm:text-base">{product.identificationNo || '-'}</td>
+                        <td className="px-4 py-3.5 text-neutral-950 font-mono tabular-nums font-bold text-[15.5px] sm:text-[17.5px] tracking-tight">{product.identificationNo || '-'}</td>
                       </tr>
                     )}
                     <tr className="border-b border-neutral-200/80">
-                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-sm sm:text-base border-r border-neutral-200/80">
+                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-[15.5px] sm:text-[17.5px] border-r border-neutral-200/80">
                         <span className="block w-full" style={{ textAlignLast: 'justify', textJustify: 'inter-character' }}>
                           규격
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-neutral-900 font-medium text-sm sm:text-base leading-relaxed">{product.size}</td>
+                      <td className="px-4 py-3.5 text-neutral-900 font-mono tabular-nums font-semibold text-[15.5px] sm:text-[17.5px] leading-relaxed tracking-tight">{product.size}</td>
                     </tr>
                     <tr className="border-b border-neutral-200/80">
-                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-sm sm:text-base border-r border-neutral-200/80">
+                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-[15.5px] sm:text-[17.5px] border-r border-neutral-200/80">
                         <span className="block w-full" style={{ textAlignLast: 'justify', textJustify: 'inter-character' }}>
                           대표 재질
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-neutral-900 font-medium text-sm sm:text-base">{product.material}</td>
+                      <td className="px-4 py-3.5 text-neutral-900 font-semibold text-[15.5px] sm:text-[17.5px]">{product.material}</td>
                     </tr>
                     <tr>
-                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-sm sm:text-base border-r border-neutral-200/80">
+                      <td className="w-1/5 min-w-[100px] px-4 py-3.5 text-neutral-600 font-bold text-[15.5px] sm:text-[17.5px] border-r border-neutral-200/80">
                         <span className="block w-full" style={{ textAlignLast: 'justify', textJustify: 'inter-character' }}>
                           판매 금액
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 text-neutral-950 font-sans text-sm sm:text-base tracking-tight">
-                        <span className="text-base sm:text-xl font-extrabold font-mono text-neutral-950">{formatPriceNumber(product.price)}</span>
-                        <span className="text-sm sm:text-base font-medium text-neutral-700 ml-1">원</span>
+                      <td className="px-4 py-3.5 text-neutral-950 font-sans text-[15.5px] sm:text-[17.5px] tracking-tight">
+                        <span className="text-[18px] sm:text-[23px] font-black font-mono tabular-nums text-neutral-950 tracking-tight">{formatPriceNumber(product.price)}</span>
+                        <span className="text-[15.5px] sm:text-[17.5px] font-bold text-neutral-800 ml-1">원</span>
                         <span className="text-xs sm:text-sm font-sans font-medium text-neutral-500 ml-2">(VAT 포함)</span>
                       </td>
                     </tr>
