@@ -4,9 +4,11 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
-  const isGithubPages = process.env.GITHUB_PAGES === 'true';
+  const isGithub = process.env.GITHUB_PAGES === 'true' || process.env.GITHUB_ACTIONS === 'true';
   const repoName = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split('/')[1] : '';
-  const base = isGithubPages ? (repoName ? `/${repoName}/` : './') : '/';
+  
+  // GitHub Pages hosted on subpath requires repository name or relative base path './'
+  const base = isGithub ? (repoName ? `/${repoName}/` : './') : './';
 
   return {
     base,
