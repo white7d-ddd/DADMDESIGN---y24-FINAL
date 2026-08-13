@@ -151,9 +151,6 @@ export default function ConstructionPortfolio({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-3 left-3 bg-neutral-900/70 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider">
-                    사진 1
-                  </div>
                 </div>
 
                 {/* Photo 2 */}
@@ -164,9 +161,6 @@ export default function ConstructionPortfolio({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-3 left-3 bg-neutral-900/70 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider">
-                    사진 2
-                  </div>
                 </div>
               </div>
 
