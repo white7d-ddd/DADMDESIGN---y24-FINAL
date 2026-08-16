@@ -475,12 +475,12 @@ ${asContent}
             </p>
           </div>
         ) : (
-          <div className="flex justify-center border-b border-neutral-200/80 mb-12 max-w-2xl mx-auto" id="inquiry-tab-switcher">
-            <div className="flex space-x-2 sm:space-x-8">
+          <div className="flex justify-center border-b border-neutral-200/80 mb-12 max-w-3xl mx-auto" id="inquiry-tab-switcher">
+            <div className="flex space-x-3 sm:space-x-10">
               {showPriceTab && (
                 <button
                   onClick={() => { setActiveTab('price'); resetFormState(); }}
-                  className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
+                  className={`py-4 px-3 sm:px-6 font-sans font-black text-lg sm:text-xl tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
                     activeTab === 'price'
                       ? 'border-neutral-950 text-neutral-950 scale-105'
                       : 'border-transparent text-neutral-400 hover:text-neutral-900'
@@ -492,7 +492,7 @@ ${asContent}
               {showCatalogTab && (
                 <button
                   onClick={() => { setActiveTab('catalog'); resetFormState(); }}
-                  className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
+                  className={`py-4 px-3 sm:px-6 font-sans font-black text-lg sm:text-xl tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
                     activeTab === 'catalog'
                       ? 'border-neutral-950 text-neutral-950 scale-105'
                       : 'border-transparent text-neutral-400 hover:text-neutral-900'
@@ -504,7 +504,7 @@ ${asContent}
               {showAsTab && (
                 <button
                   onClick={() => { setActiveTab('as'); resetFormState(); }}
-                  className={`py-4 px-3 sm:px-5 font-sans font-extrabold text-xs sm:text-sm tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
+                  className={`py-4 px-3 sm:px-6 font-sans font-black text-lg sm:text-xl tracking-wide border-b-2 transition-all duration-200 cursor-pointer ${
                     activeTab === 'as'
                       ? 'border-neutral-950 text-neutral-950 scale-105'
                       : 'border-transparent text-neutral-400 hover:text-neutral-900'
@@ -526,22 +526,22 @@ ${asContent}
             <h2 className="text-xl font-bold text-neutral-900 font-sans mb-3">
               성공적으로 전달되었습니다
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-500 font-sans leading-relaxed mb-8">
+            <p className="text-sm sm:text-base text-neutral-500 font-sans leading-relaxed mb-8">
               {successMessage}
             </p>
 
             {isAsSubmitted && lastAsMailto && (
               <div className="mb-8 p-5 bg-neutral-50 border border-neutral-100 rounded-2xl text-left">
-                <h4 className="text-xs font-bold text-neutral-700 mb-2 flex items-center">
+                <h4 className="text-sm font-bold text-neutral-700 mb-2 flex items-center">
                   <span className="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
                   이메일 연동 발송 안내
                 </h4>
-                <p className="text-[11px] text-neutral-500 leading-relaxed mb-4">
+                <p className="text-xs text-neutral-500 leading-relaxed mb-4">
                   고객님의 메일 프로그램을 통해 A/S 하자접수 상세 내역을 즉시 발송할 수 있도록 메일 작성기를 호출하였습니다. 혹시 메일 창이 뜨지 않았거나 다시 접수하시려면 아래 버튼을 눌러주십시오.
                 </p>
                 <a
                   href={lastAsMailto}
-                  className="w-full inline-flex items-center justify-center space-x-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                  className="w-full inline-flex items-center justify-center space-x-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-bold text-sm rounded-xl shadow-xs transition-colors cursor-pointer"
                 >
                   <span>이메일 프로그램으로 직접 메일 발송하기</span>
                 </a>
@@ -550,16 +550,16 @@ ${asContent}
 
             {isCatalogSubmitted && lastCatalogMailto && (
               <div className="mb-8 p-5 bg-neutral-50 border border-neutral-100 rounded-2xl text-left">
-                <h4 className="text-xs font-bold text-neutral-700 mb-2 flex items-center">
+                <h4 className="text-sm font-bold text-neutral-700 mb-2 flex items-center">
                   <span className="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
                   이메일 연동 발송 안내
                 </h4>
-                <p className="text-[11px] text-neutral-500 leading-relaxed mb-4">
+                <p className="text-xs text-neutral-500 leading-relaxed mb-4">
                   고객님의 메일 프로그램을 통해 카탈로그 신청 내역을 즉시 발송할 수 있도록 메일 작성기를 호출하였습니다. 혹시 메일 창이 뜨지 않았거나 다시 접수하시려면 아래 버튼을 눌러주십시오.
                 </p>
                 <a
                   href={lastCatalogMailto}
-                  className="w-full inline-flex items-center justify-center space-x-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                  className="w-full inline-flex items-center justify-center space-x-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-bold text-sm rounded-xl shadow-xs transition-colors cursor-pointer"
                 >
                   <span>이메일 프로그램으로 직접 메일 발송하기</span>
                 </a>
@@ -568,7 +568,7 @@ ${asContent}
 
             <button
               onClick={resetFormState}
-              className="bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-xs tracking-wider uppercase px-6 py-3.5 rounded-xl hover:shadow-md cursor-pointer transition-all"
+              className="bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-sm tracking-wider uppercase px-7 py-4 rounded-xl hover:shadow-md cursor-pointer transition-all"
               id="inquiry-reset-btn"
             >
               추가 문의 접수하기
@@ -600,10 +600,10 @@ ${asContent}
                       />
                     ) : (
                       <>
-                        <h3 className="text-base font-bold text-neutral-900 font-sans">
+                        <h3 className="text-lg sm:text-xl font-bold text-neutral-900 font-sans">
                           종합 카탈로그 / 지면용 도면 브로셔 신청
                         </h3>
-                        <p className="text-[11px] text-neutral-400 font-sans mt-1">
+                        <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-1">
                           원하시는 제품군의 정밀 설계 규격과 카탈로그를 바로 요청하실 수 있습니다.
                         </p>
                       </>
@@ -612,55 +612,55 @@ ${asContent}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">성함 / 직함 <span className="text-red-500">*</span></label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">성함 / 직함 <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={catName}
                         onChange={(e) => setCatName(e.target.value)}
-                        placeholder="예: 홍길동 과장"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        placeholder="예: 홍길동 주임 / 다듬디자인"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">업체명 / 소속 부서</label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">업체명 / 소속 부서</label>
                       <input
                         type="text"
                         value={catCompany}
                         onChange={(e) => setCatCompany(e.target.value)}
-                        placeholder="예: (주)미래종합조경 설계팀"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        placeholder="예: 다듬디자인"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">연락처 <span className="text-red-500">*</span></label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">연락처 <span className="text-red-500">*</span></label>
                       <input
                         type="tel"
                         value={catTel}
                         onChange={(e) => setCatTel(e.target.value)}
                         placeholder="예: 010-1234-5678"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">이메일 주소</label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">이메일 주소</label>
                       <input
                         type="email"
                         value={catEmail}
                         onChange={(e) => setCatEmail(e.target.value)}
                         placeholder="예: landscape@company.com"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                       />
                     </div>
                   </div>
 
                   {/* Receipt Method Choice */}
                   <div>
-                    <label className="block text-xs font-bold text-neutral-500 mb-2">수령 방식 선택</label>
+                    <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">수령 방식 선택</label>
                     <div className="grid grid-cols-2 gap-4">
                       <button
                         type="button"
@@ -671,8 +671,8 @@ ${asContent}
                             : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'
                         }`}
                       >
-                        <span className="block text-xs sm:text-sm">📥 PDF 온라인 수령</span>
-                        <span className="block text-[10px] text-neutral-400 mt-1 font-normal">이메일로 즉시 다운로드 링크 전송</span>
+                        <span className="block text-sm sm:text-base">📥 PDF 온라인 수령</span>
+                        <span className="block text-xs text-neutral-400 mt-1 font-normal">이메일로 즉시 다운로드 링크 전송</span>
                       </button>
                       <button
                         type="button"
@@ -683,8 +683,8 @@ ${asContent}
                             : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'
                         }`}
                       >
-                        <span className="block text-xs sm:text-sm">📮 인쇄본 우편 수령</span>
-                        <span className="block text-[10px] text-neutral-400 mt-1 font-normal">고급 지면 브로셔 우체국 택배 발송 (무료)</span>
+                        <span className="block text-sm sm:text-base">📮 인쇄본 우편 수령</span>
+                        <span className="block text-xs text-neutral-400 mt-1 font-normal">고급 지면 브로셔 우체국 택배 발송 (무료)</span>
                       </button>
                     </div>
                   </div>
@@ -692,37 +692,35 @@ ${asContent}
                   {/* Mail address block */}
                   {catMethod === 'printed' && (
                     <div className="animate-fade-in bg-neutral-50 p-4 rounded-xl border border-neutral-200/60">
-                      <label className="block text-xs font-bold text-neutral-600 mb-2">배송 주소 기재 <span className="text-red-500">*</span></label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">배송 주소 기재 <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={catAddress}
                         onChange={(e) => setCatAddress(e.target.value)}
                         placeholder="정확한 상세 주소를 기재해주세요. (예: 서울시 마포구 상암동...)"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:bg-white focus:border-neutral-900 transition-colors bg-white"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:bg-white focus:border-neutral-900 transition-colors bg-white"
                         required={catMethod === 'printed'}
                       />
                     </div>
                   )}
 
-
-
                   {/* Message textarea */}
                   <div>
-                    <label className="block text-xs font-bold text-neutral-500 mb-2">추가 상세 요구사항 및 문의 (도면 첨부 요청 등)</label>
+                    <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">추가 상세 요구사항 및 문의 (도면 첨부 요청 등)</label>
                     <textarea
                       rows={4}
                       value={catContent}
                       onChange={(e) => setCatContent(e.target.value)}
                       placeholder="특정 제품 설계 단가나 대량 조달 납품 가액 견적이 수록된 파일이 함께 필요하신 경우 상세히 기입해주세요."
-                      className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 resize-y leading-relaxed"
+                      className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 resize-y leading-relaxed"
                     ></textarea>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center space-x-2 bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-xs tracking-wider uppercase py-4 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
+                    className="w-full flex items-center justify-center space-x-2 bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-sm sm:text-base tracking-wider uppercase py-4 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
                   >
-                    <FileDown size={14} />
+                    <FileDown size={16} />
                     <span>카탈로그 및 설계자료 수령 신청 접수</span>
                   </button>
                 </form>
@@ -935,34 +933,34 @@ ${asContent}
                     return (
                       <div className="relative group animate-fade-in" key={item.id}>
                         {/* Timeline Circle Marker */}
-                        <span className="absolute -left-[41px] sm:-left-[57px] top-1.5 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-neutral-950 text-white border border-white shadow-sm ring-4 ring-neutral-50 font-sans text-[10px] sm:text-xs font-black">
+                        <span className="absolute -left-[43px] sm:-left-[61px] top-1.5 flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-neutral-950 text-white border border-white shadow-sm ring-4 ring-neutral-50 font-sans text-xs sm:text-sm font-black">
                           {monthText}
                         </span>
 
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <span className="inline-block bg-neutral-100 text-neutral-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider font-sans">
+                            <span className="inline-block bg-neutral-100 text-neutral-800 text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full uppercase tracking-wider font-sans">
                               {yearText}년 {monthText}월 고시자료
                             </span>
                             
                             {/* Delete/Edit Buttons */}
                             {isAdminLoggedIn ? (
-                              <div className="flex items-center space-x-1.5 bg-neutral-50 px-2 py-1 rounded-lg border border-neutral-200">
+                              <div className="flex items-center space-x-1.5 bg-neutral-50 px-2.5 py-1.5 rounded-lg border border-neutral-200">
                                 <button
                                   onClick={() => handleStartEditPrice(item)}
-                                  className="text-neutral-500 hover:text-neutral-900 p-1 transition-colors rounded hover:bg-neutral-100 flex items-center space-x-1 text-[11px] font-bold"
+                                  className="text-neutral-500 hover:text-neutral-900 p-1 transition-colors rounded hover:bg-neutral-100 flex items-center space-x-1 text-xs font-bold"
                                   title="수정하기"
                                 >
-                                  <Edit2 size={12} />
+                                  <Edit2 size={13} />
                                   <span>수정</span>
                                 </button>
                                 <span className="text-neutral-300">|</span>
                                 <button
                                   onClick={() => handleDeletePrice(item.id)}
-                                  className="text-neutral-400 hover:text-red-500 p-1 transition-colors rounded hover:bg-red-50 flex items-center space-x-1 text-[11px] font-bold"
+                                  className="text-neutral-400 hover:text-red-500 p-1 transition-colors rounded hover:bg-red-50 flex items-center space-x-1 text-xs font-bold"
                                   title="삭제하기"
                                 >
-                                  <Trash2 size={12} />
+                                  <Trash2 size={13} />
                                   <span>삭제</span>
                                 </button>
                               </div>
@@ -973,16 +971,16 @@ ${asContent}
                                 className="text-neutral-300 hover:text-red-500 p-1 transition-colors rounded-full hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                                 title="삭제하기"
                               >
-                                <Trash2 size={13} />
+                                <Trash2 size={14} />
                               </button>
                             )}
                           </div>
 
-                          <h3 className="text-base sm:text-lg font-black text-neutral-900 font-sans leading-tight">
+                          <h3 className="text-xl sm:text-2xl font-black text-neutral-900 font-sans leading-tight">
                             {item.title}
                           </h3>
                           
-                          <p className="text-xs sm:text-sm text-neutral-500 font-sans leading-relaxed">
+                          <p className="text-sm sm:text-base text-neutral-600 font-sans leading-relaxed">
                             {item.description}
                           </p>
 
@@ -1017,8 +1015,8 @@ ${asContent}
                             </div>
                             
                             {/* Static Info strip */}
-                            <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm border border-neutral-100 rounded-lg px-2.5 py-1 text-[9px] font-mono font-bold text-neutral-800 shadow-sm flex items-center space-x-1">
-                              <Maximize2 size={10} />
+                            <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm border border-neutral-100 rounded-lg px-2.5 py-1 text-[10px] font-mono font-bold text-neutral-800 shadow-sm flex items-center space-x-1">
+                              <Maximize2 size={11} />
                               <span>CLICK IMAGE TO EXPAND</span>
                             </div>
                           </div>
@@ -1026,9 +1024,9 @@ ${asContent}
                           <div className="flex space-x-3 pt-1">
                             <button
                               onClick={() => setLightboxImg(item.imageUrl)}
-                              className="inline-flex items-center space-x-1.5 text-[11px] font-bold text-neutral-800 hover:text-neutral-950 hover:underline cursor-pointer"
+                              className="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-neutral-800 hover:text-neutral-950 hover:underline cursor-pointer"
                             >
-                              <Maximize2 size={12} />
+                              <Maximize2 size={14} />
                               <span>상세 단가표 정밀 원본 보기</span>
                             </button>
                           </div>
@@ -1060,15 +1058,13 @@ ${asContent}
                         isAdminLoggedIn={isAdminLoggedIn}
                         onUpdateHeaders={onUpdatePageHeaders}
                         centered={false}
-                        icon={<Wrench size={18} className="text-neutral-500" />}
                       />
                     ) : (
                       <>
-                        <h3 className="text-base font-bold text-neutral-900 font-sans flex items-center space-x-2">
-                          <Wrench size={18} className="text-neutral-500" />
-                          <span>옥외 가로시설물 신속 하자접수 및 유지보수 신청</span>
+                        <h3 className="text-lg sm:text-xl font-bold text-neutral-900 font-sans">
+                          옥외 가로시설물 신속 하자접수 및 유지보수 신청
                         </h3>
-                        <p className="text-[11px] text-neutral-400 font-sans mt-1">
+                        <p className="text-xs sm:text-sm text-neutral-400 font-sans mt-1">
                           다듬디자인 명품 하자보증 보장 서비스입니다. 접수해주시면 긴급 모바일 긴급 출동팀이 현장으로 긴급 배정됩니다.
                         </p>
                       </>
@@ -1077,24 +1073,24 @@ ${asContent}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">접수 기관 / 대표 고객명 <span className="text-red-500">*</span></label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">접수 기관 / 대표 고객명 <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={asName}
                         onChange={(e) => setAsName(e.target.value)}
-                        placeholder="예: 홍길동 주임 / 상암근린 관리소"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        placeholder="예: 홍길동 주임 / 다듬디자인"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">비상 연락처 <span className="text-red-500">*</span></label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">비상 연락처 <span className="text-red-500">*</span></label>
                       <input
                         type="tel"
                         value={asTel}
                         onChange={(e) => setAsTel(e.target.value)}
                         placeholder="예: 010-1234-5678"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                         required
                       />
                     </div>
@@ -1102,23 +1098,23 @@ ${asContent}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">연락 가능한 메일</label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">연락 가능한 메일</label>
                       <input
                         type="email"
                         value={asEmail}
                         onChange={(e) => setAsEmail(e.target.value)}
                         placeholder="예: support@agency.go.kr"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-neutral-500 mb-2">시설물 정식 위치 <span className="text-red-500">*</span></label>
+                      <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">시설물 정식 위치 <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={asLocation}
                         onChange={(e) => setAsLocation(e.target.value)}
                         placeholder="예: 경기도 용인시 수지구 근린공원 중앙광장 내부"
-                        className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
+                        className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 transition-colors"
                         required
                       />
                     </div>
@@ -1126,12 +1122,12 @@ ${asContent}
 
                   {/* Attachment photo simulation */}
                   <div>
-                    <label className="block text-xs font-bold text-neutral-500 mb-2">파손 부위 / 현장 실물 현황 사진 첨부</label>
+                    <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">파손 부위 / 현장 실물 현황 사진 첨부</label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="border border-dashed border-neutral-300 rounded-xl p-5 flex flex-col items-center justify-center bg-neutral-50 text-center relative hover:bg-neutral-100 transition-all">
-                        <Upload size={20} className="text-neutral-400 mb-2" />
-                        <span className="text-xs font-bold text-neutral-600">현장 하자 사진 올리기</span>
-                        <span className="text-[10px] text-neutral-400 mt-1">파일 직접 선택하기 (카메라 촬영 대응)</span>
+                        <Upload size={22} className="text-neutral-400 mb-2" />
+                        <span className="text-sm font-bold text-neutral-700">현장 하자 사진 올리기</span>
+                        <span className="text-xs text-neutral-400 mt-1">파일 직접 선택하기 (카메라 촬영 대응)</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -1149,11 +1145,11 @@ ${asContent}
                               onClick={() => setAsAttachedPhoto(null)}
                               className="absolute top-1 right-1 p-0.5 bg-neutral-950/80 rounded-full text-white"
                             >
-                              <X size={10} />
+                              <X size={12} />
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[10px] text-neutral-400 text-center leading-relaxed">사진 첨부 시 도면 연구실 및 긴급 유지 보수 엔지니어가 부속 자재를 즉시 예비 매칭하여 원스톱 수리를 완료합니다.</span>
+                          <span className="text-xs text-neutral-400 text-center leading-relaxed">사진 첨부 시 도면 연구실 및 긴급 유지 보수 엔지니어가 부속 자재를 즉시 예비 매칭하여 원스톱 수리를 완료합니다.</span>
                         )}
                       </div>
                     </div>
@@ -1161,22 +1157,22 @@ ${asContent}
 
                   {/* Fail content details */}
                   <div>
-                    <label className="block text-xs font-bold text-neutral-500 mb-2">A/S 요청 사유 및 파손 증상 상세 기술 <span className="text-red-500">*</span></label>
+                    <label className="block text-sm sm:text-base font-bold text-neutral-700 mb-2">A/S 요청 사유 및 파손 증상 상세 기술 <span className="text-red-500">*</span></label>
                     <textarea
                       rows={5}
                       value={asContent}
                       onChange={(e) => setAsContent(e.target.value)}
                       placeholder="예:&#13;1. 파손 유형: 외부 충격에 의한 목재 벤치 앉음 면 휨/균열&#13;2. 하자 수량: 등받이 벤치 2개소&#13;3. 요구 조치: 동일 규격 친환경 원목 부재 전면 일대 교체 요청"
-                      className="w-full text-xs sm:text-sm px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 resize-y leading-relaxed"
+                      className="w-full text-sm sm:text-base px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 resize-y leading-relaxed"
                       required
                     ></textarea>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center space-x-2 bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-xs tracking-wider uppercase py-4 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
+                    className="w-full flex items-center justify-center space-x-2 bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-sm sm:text-base tracking-wider uppercase py-4 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer"
                   >
-                    <Wrench size={14} />
+                    <Wrench size={16} />
                     <span>A/S 하자보수 긴급 출동 신청 등록</span>
                   </button>
                 </form>

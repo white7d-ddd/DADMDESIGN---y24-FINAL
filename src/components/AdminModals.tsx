@@ -33,6 +33,8 @@ export function ProductModal({ isOpen, onClose, product, categories, onSave }: P
   const [pHasPdf, setPHasPdf] = useState(false);
   const [pIsProcurement, setPIsProcurement] = useState(false);
   const [pIsSignature, setPIsSignature] = useState(false);
+  const [pIsNew, setPIsNew] = useState(false);
+  const [pNewMarkImageUrl, setPNewMarkImageUrl] = useState('');
   const [pDesignMaterialEnabled, setPDesignMaterialEnabled] = useState(false);
   const [pDesignMaterialUrl, setPDesignMaterialUrl] = useState('');
   const [pImageUrls, setPImageUrls] = useState<string[]>(['']);
@@ -54,6 +56,8 @@ export function ProductModal({ isOpen, onClose, product, categories, onSave }: P
       setPHasPdf(product.hasPdf);
       setPIsProcurement(product.isProcurement !== false);
       setPIsSignature(product.isSignature || false);
+      setPIsNew(product.isNew || false);
+      setPNewMarkImageUrl(product.newMarkImageUrl || '');
       setPDesignMaterialEnabled(product.designMaterialEnabled || false);
       setPDesignMaterialUrl(product.designMaterialUrl || '');
       setPImageUrls(product.images && product.images.length > 0 ? product.images : ['']);
@@ -73,6 +77,8 @@ export function ProductModal({ isOpen, onClose, product, categories, onSave }: P
       setPHasPdf(false);
       setPIsProcurement(false);
       setPIsSignature(false);
+      setPIsNew(false);
+      setPNewMarkImageUrl('');
       setPDesignMaterialEnabled(false);
       setPDesignMaterialUrl('');
       setPImageUrls(['']);
@@ -130,6 +136,8 @@ export function ProductModal({ isOpen, onClose, product, categories, onSave }: P
       hasPdf: pHasPdf,
       isProcurement: pIsProcurement,
       isSignature: pIsSignature,
+      isNew: pIsNew,
+      newMarkImageUrl: pIsNew && pNewMarkImageUrl.trim() ? convertSynologyToDirectUrl(pNewMarkImageUrl.trim()) : undefined,
       designMaterialEnabled: pDesignMaterialEnabled,
       designMaterialUrl: convertSynologyUrl(pDesignMaterialUrl),
       createdAt: product?.createdAt || new Date().toISOString().split('T')[0]
@@ -340,7 +348,7 @@ export function ProductModal({ isOpen, onClose, product, categories, onSave }: P
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-50 p-4 rounded-2xl border border-neutral-150">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-neutral-50 p-4 rounded-2xl border border-neutral-150">
               <div className="flex items-center space-x-3">
                 <input
                   type="checkbox"
@@ -361,7 +369,90 @@ export function ProductModal({ isOpen, onClose, product, categories, onSave }: P
                 />
                 <label htmlFor="modal-signature-allowed" className="text-xs font-bold text-amber-800 cursor-pointer">메인페이지 게시</label>
               </div>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="modal-new-allowed"
+                  checked={pIsNew}
+                  onChange={(e) => setPIsNew(e.target.checked)}
+                  className="h-4 w-4 text-red-600 border-neutral-300 rounded focus:ring-red-500"
+                />
+                <label htmlFor="modal-new-allowed" className="text-xs font-bold text-red-600 cursor-pointer flex items-center space-x-1">
+                  <span>신제품으로 지정</span>
+                  <span className="text-[10px] text-red-500 font-medium">(마크 표기)</span>
+                </label>
+              </div>
             </div>
+
+            {/* 신제품 개별 마크 이미지 설정 (선택사항, 시놀로지 NAS 지원) */}
+            {pIsNew && (
+              <div className="bg-red-50/50 p-4 rounded-2xl border border-red-200/70 space-y-3 animate-fade-in">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                  <div className="md:col-span-3">
+                    <label className="block text-xs font-bold text-red-900 mb-1.5 flex items-center justify-between">
+                      <span>개별 제품 전용 신제품 마크 이미지 URL (선택)</span>
+                      <span className="px-1.5 py-0.5 bg-amber-500 text-neutral-950 font-bold rounded text-[9px] uppercase font-sans">Synology NAS 지원</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={pNewMarkImageUrl}
+                        onChange={(e) => setPNewMarkImageUrl(e.target.value)}
+                        onBlur={(e) => {
+                          const converted = convertSynologyToDirectUrl(e.target.value);
+                          if (converted !== e.target.value) {
+                            setPNewMarkImageUrl(converted);
+                          }
+                        }}
+                        placeholder="시놀로지 NAS 공유 링크 또는 이미지 직링크 (미입력 시 기본 마크/NEW 표기)"
+                        className="w-full text-xs px-3.5 py-2.5 border border-red-200 bg-white rounded-xl focus:outline-none focus:border-red-600 font-mono"
+                      />
+                      <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                        <Upload size={13} />
+                        <span>파일 선택</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              if (event.target?.result) {
+                                setPNewMarkImageUrl(event.target.result as string);
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+                      </label>
+                    </div>
+                    <p className="text-[10px] text-red-700/80 mt-1">
+                      💡 시놀로지 NAS 파일 공유 링크(<code className="bg-red-100 px-1 py-0.5 rounded font-mono">gofile.me/...</code> 등)를 넣으시면 이미지 주소로 자동 변환됩니다.
+                    </p>
+                  </div>
+                  <div className="md:col-span-1 bg-white p-2 rounded-xl border border-red-200 flex flex-col items-center justify-center">
+                    <span className="text-[9px] font-bold text-neutral-400 mb-1 block w-full text-center uppercase">마크 미리보기</span>
+                    <div className="relative h-10 w-full rounded-lg overflow-hidden border border-neutral-200 bg-neutral-50 flex items-center justify-center p-1">
+                      {pNewMarkImageUrl ? (
+                        <img
+                          src={getDirectImageUrl(pNewMarkImageUrl)}
+                          alt="신제품 마크 미리보기"
+                          className="h-full w-auto object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback-mark/50/50';
+                          }}
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <span className="text-red-600 font-black text-xs font-sans tracking-widest">NEW</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 설계자료 다운로드 설정 (시놀로지 나스 등) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-neutral-50 p-4 rounded-2xl border border-neutral-150">
@@ -445,6 +536,7 @@ export function CategoryModal({
 }: CategoryModalProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingCat, setEditingCat] = useState<Category | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   
   const [catId, setCatId] = useState('');
   const [catName, setCatName] = useState('');
@@ -462,6 +554,7 @@ export function CategoryModal({
     setCatIsGeneral(true);
     setIsAdding(true);
     setEditingCat(null);
+    setDeleteConfirmId(null);
   };
 
   const openEdit = (cat: Category) => {
@@ -473,6 +566,7 @@ export function CategoryModal({
     setCatIsProcurement(cat.isProcurement !== false);
     setCatIsGeneral(cat.isGeneral !== false);
     setIsAdding(false);
+    setDeleteConfirmId(null);
   };
 
   const handleMoveUp = (id: string) => {
@@ -555,18 +649,10 @@ export function CategoryModal({
 
   const handleDelete = (id: string) => {
     if (id === 'all') {
-      alert('시스템 기본 카테고리는 삭제할 수 없습니다.');
       return;
     }
-    const hasProducts = products.some(p => p.categoryId === id);
-    let confirmMsg = `정말로 이 카테고리를 삭제하시겠습니까?`;
-    if (hasProducts) {
-      confirmMsg = `경고! 이 카테고리에 소속된 제품이 존재합니다. 카테고리를 삭제하면 소속 제품들의 필터링이 올바르게 작동하지 않을 수 있습니다. 그래도 삭제하시겠습니까?`;
-    }
-
-    if (window.confirm(confirmMsg)) {
-      onUpdateCategories(categories.filter(c => c.id !== id));
-    }
+    onUpdateCategories(categories.filter(c => c.id !== id));
+    setDeleteConfirmId(null);
   };
 
   if (!isOpen) return null;
@@ -784,36 +870,57 @@ export function CategoryModal({
                             <td className="py-3 px-4 text-neutral-500 font-mono font-bold">{cat.id === 'all' ? '-' : `${count}개`}</td>
                             <td className="py-3 px-4 text-right">
                               {cat.id !== 'all' ? (
-                                <div className="flex justify-end space-x-1">
-                                  <button
-                                    onClick={() => handleMoveUp(cat.id)}
-                                    disabled={categories.filter(c => c.id !== 'all').findIndex(c => c.id === cat.id) === 0}
-                                    className="p-1.5 text-neutral-400 hover:text-neutral-900 rounded hover:bg-neutral-100 disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
-                                    title="순서 위로"
-                                  >
-                                    <ArrowUp size={13} />
-                                  </button>
-                                  <button
-                                    onClick={() => handleMoveDown(cat.id)}
-                                    disabled={categories.filter(c => c.id !== 'all').findIndex(c => c.id === cat.id) === categories.filter(c => c.id !== 'all').length - 1}
-                                    className="p-1.5 text-neutral-400 hover:text-neutral-900 rounded hover:bg-neutral-100 disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
-                                    title="순서 아래로"
-                                  >
-                                    <ArrowDown size={13} />
-                                  </button>
-                                  <button
-                                    onClick={() => openEdit(cat)}
-                                    className="p-1.5 text-neutral-400 hover:text-neutral-900 rounded hover:bg-neutral-100 cursor-pointer"
-                                  >
-                                    <Edit2 size={13} />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDelete(cat.id)}
-                                    className="p-1.5 text-neutral-400 hover:text-red-600 rounded hover:bg-red-50 cursor-pointer"
-                                  >
-                                    <Trash2 size={13} />
-                                  </button>
-                                </div>
+                                deleteConfirmId === cat.id ? (
+                                  <div className="flex items-center justify-end space-x-1.5 animate-fade-in">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDelete(cat.id)}
+                                      className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[11px] font-bold shadow-xs cursor-pointer"
+                                    >
+                                      삭제 확인
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setDeleteConfirmId(null)}
+                                      className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 rounded text-[11px] font-bold cursor-pointer"
+                                    >
+                                      취소
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-end space-x-1">
+                                    <button
+                                      onClick={() => handleMoveUp(cat.id)}
+                                      disabled={categories.filter(c => c.id !== 'all').findIndex(c => c.id === cat.id) === 0}
+                                      className="p-1.5 text-neutral-400 hover:text-neutral-900 rounded hover:bg-neutral-100 disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
+                                      title="순서 위로"
+                                    >
+                                      <ArrowUp size={13} />
+                                    </button>
+                                    <button
+                                      onClick={() => handleMoveDown(cat.id)}
+                                      disabled={categories.filter(c => c.id !== 'all').findIndex(c => c.id === cat.id) === categories.filter(c => c.id !== 'all').length - 1}
+                                      className="p-1.5 text-neutral-400 hover:text-neutral-900 rounded hover:bg-neutral-100 disabled:opacity-20 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
+                                      title="순서 아래로"
+                                    >
+                                      <ArrowDown size={13} />
+                                    </button>
+                                    <button
+                                      onClick={() => openEdit(cat)}
+                                      className="p-1.5 text-neutral-400 hover:text-neutral-900 rounded hover:bg-neutral-100 cursor-pointer"
+                                      title="수정"
+                                    >
+                                      <Edit2 size={13} />
+                                    </button>
+                                    <button
+                                      onClick={() => setDeleteConfirmId(cat.id)}
+                                      className="p-1.5 text-neutral-400 hover:text-red-600 rounded hover:bg-red-50 cursor-pointer"
+                                      title="카테고리 삭제"
+                                    >
+                                      <Trash2 size={13} />
+                                    </button>
+                                  </div>
+                                )
                               ) : (
                                 <span className="text-[10px] bg-neutral-100 px-2 py-0.5 rounded text-neutral-400 font-bold">기본</span>
                               )}
@@ -1080,6 +1187,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
   const [cAsAlertEmail, setCAsAlertEmail] = useState('');
   const [cCatalogAlertEmail, setCCatalogAlertEmail] = useState('');
   const [cNarajangterMarkUrl, setCNarajangterMarkUrl] = useState('');
+  const [cNewProductMarkUrl, setCNewProductMarkUrl] = useState('');
 
   // New states for interactive History & Directions editing
   const [cHistoryList, setCHistoryList] = useState<any[]>([]);
@@ -1111,6 +1219,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
       setCAboutUsText(companyInfo.aboutUsText);
       setCAboutUsImage(companyInfo.aboutUsImage || '/src/assets/images/street_bench_1783302667162.jpg');
       setCNarajangterMarkUrl(companyInfo.narajangterMarkUrl || '');
+      setCNewProductMarkUrl(companyInfo.newProductMarkUrl || '');
       setCMapAddress(companyInfo.mapAddress || '');
 
       setCEnablePriceTab(companyInfo.enablePriceTab ?? true);
@@ -1145,6 +1254,7 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
       asAlertEmail: cAsAlertEmail.trim(),
       catalogAlertEmail: cCatalogAlertEmail.trim(),
       narajangterMarkUrl: cNarajangterMarkUrl.trim(),
+      newProductMarkUrl: cNewProductMarkUrl.trim(),
       enablePriceTab: cEnablePriceTab,
       enableCatalogTab: cEnableCatalogTab,
       enableAsTab: cEnableAsTab,
@@ -1546,6 +1656,73 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                               fill="#0047a0" 
                             />
                           </svg>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 공통 신제품 표시 마크 이미지 URL */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-neutral-100">
+                    <div className="md:col-span-3">
+                      <label className="block text-xs font-bold text-neutral-500 mb-1.5 flex items-center justify-between">
+                        <span>공통 신제품 표시 마크 이미지 URL (선택)</span>
+                        <span className="px-1.5 py-0.5 bg-amber-500 text-neutral-950 font-bold rounded text-[9px] uppercase font-sans">Synology NAS 지원</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={cNewProductMarkUrl}
+                          onChange={(e) => setCNewProductMarkUrl(e.target.value)}
+                          onBlur={(e) => {
+                            const converted = convertSynologyToDirectUrl(e.target.value);
+                            if (converted !== e.target.value) {
+                              setCNewProductMarkUrl(converted);
+                            }
+                          }}
+                          placeholder="시놀로지 파일 공유 링크 또는 이미지 주소 (미입력 시 기본 NEW 텍스트 표기)"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
+                        />
+                        <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                          <Upload size={13} />
+                          <span>파일 선택</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                if (event.target?.result) {
+                                  setCNewProductMarkUrl(event.target.result as string);
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                            }}
+                          />
+                        </label>
+                      </div>
+                      <p className="text-[10px] text-neutral-400 mt-1 leading-relaxed">
+                        신제품으로 지정된 제품의 이미지 좌측 상단에 오버레이로 표시될 마크 이미지를 설정합니다. 
+                        시놀로지 NAS 공유 링크(<code className="bg-neutral-100 px-1 py-0.5 rounded font-mono">/sharing/</code> 또는 <code className="bg-neutral-100 px-1 py-0.5 rounded font-mono">gofile.me/...</code>)를 지원합니다.
+                      </p>
+                    </div>
+                    <div className="md:col-span-1 bg-neutral-50 p-2 rounded-xl border border-neutral-200/60 flex flex-col items-center justify-center">
+                      <span className="text-[9px] font-bold text-neutral-400 mb-1 block w-full text-center uppercase">마크 프리뷰</span>
+                      <div className="relative h-10 w-full rounded-lg overflow-hidden border border-neutral-200 bg-white shadow-sm p-1.5 flex items-center justify-center">
+                        {cNewProductMarkUrl ? (
+                          <img
+                            src={getDirectImageUrl(cNewProductMarkUrl)}
+                            alt="신제품 마크"
+                            className="h-full w-auto object-contain"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback-mark/50/50';
+                            }}
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <span className="text-red-600 font-black text-xs font-sans tracking-widest">NEW</span>
                         )}
                       </div>
                     </div>

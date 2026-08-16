@@ -1,4 +1,4 @@
-import { Category, Product, Banner, CompanyInfo, ConstructionProject, HomeSectionInfo, PageHeaders, PopupItem } from '../types';
+import { Category, Product, Banner, CompanyInfo, ConstructionProject, HomeSectionInfo, PageHeaders, PopupItem, TypographySettings } from '../types';
 
 export const defaultCategories: Category[] = [
   {
@@ -8,46 +8,94 @@ export const defaultCategories: Category[] = [
     icon: 'Grid'
   },
   {
+    id: 'pavilion',
+    name: '전통정자',
+    description: '한국 고유의 멋과 기품을 담아낸 전통형 정자 및 야외 쉼터',
+    icon: '1전통정자'
+  },
+  {
     id: 'pergola',
     name: '파고라',
     description: '공원과 보행 공간에 격조 높은 휴식과 그늘을 선사하는 모던한 디자인 파고라',
-    icon: 'Umbrella'
-  },
-  {
-    id: 'pavilion',
-    name: '전통형정자',
-    description: '한국 고유의 멋과 기품을 담아낸 전통형 정자 및 야외 쉼터',
-    icon: 'Landmark'
-  },
-  {
-    id: 'bench',
-    name: '옥외용벤치',
-    description: '유려한 곡선과 최고급 천연 휴먼 목재가 주는 따뜻한 감각의 명품 야외 벤치',
-    icon: 'Sofa'
+    icon: '2 파고라'
   },
   {
     id: 'bin',
     name: '분리수거장',
     description: '거리 미관을 한층 높이고 유지관리가 뛰어난 위생적인 분리수거함 및 쉘터형 수거장',
-    icon: 'Recycle'
+    icon: '3 분리수거장'
   },
   {
     id: 'bicycle',
-    name: '자전거보관대',
+    name: '자전거 보관대',
     description: '자전거와 모빌리티를 안전하고 깔끔하게 보관하는 전용 보관대 및 쉘터',
-    icon: 'Bike'
+    icon: '4 자전거 보관대'
+  },
+  {
+    id: 'bench',
+    name: '옥외용 벤치',
+    description: '유려한 곡선과 최고급 천연 휴먼 목재가 주는 따뜻한 감각의 명품 야외 벤치',
+    icon: '5 옥외용 벤치'
+  },
+  {
+    id: 'tree_bench',
+    name: '수목보호의자',
+    description: '도심 속 녹지 공간과 가로수를 감싸며 자연과 어우러지는 수목보호 벤치',
+    icon: '6 수목보호의자'
+  },
+  {
+    id: 'bus_shelter',
+    name: '버스승강장',
+    description: '보행자와 대중교통 이용객에게 쾌적한 쉼과 안전을 제공하는 쉘터형 버스승강장',
+    icon: '7 버스승강장'
+  },
+  {
+    id: 'kids_bus_shelter',
+    name: '어린이 버스승강장',
+    description: '통학길 어린이들의 안전한 대기와 승하차를 돕는 맞춤형 키즈 세이프티 쉘터',
+    icon: '8 어린이 버스승강장'
   },
   {
     id: 'fitness',
-    name: '야외운동시설물',
-    description: '시민의 건강 증진을 위해 야외 공원에 설치하는 전문 운동 기구',
-    icon: 'Dumbbell'
+    name: '야외운동시설',
+    description: '시민의 건강 증진과 활력 있는 여가 활동을 위한 야외 공원 전문 운동 기구',
+    icon: '9 야외운동시설'
   },
   {
-    id: 'bollard',
-    name: '기타공공시설',
-    description: '보행 안전과 경관 보존을 책임지는 볼라드, 플랜터, 화분대 등의 공공 시설물',
-    icon: 'Trees'
+    id: 'fence',
+    name: '휀스',
+    description: '공간 구획과 보행 안전, 도시 미관을 동시에 충족하는 프리미엄 경계 휀스',
+    icon: '10 휀스'
+  },
+  {
+    id: 'playground',
+    name: '어린이놀이터',
+    description: '친환경 소재와 안전 규격 설계로 아이들의 꿈과 창의력을 키우는 조합놀이대',
+    icon: '11 어린이놀이터'
+  },
+  {
+    id: 'pet_park',
+    name: '반려동물 놀이터',
+    description: '반려동물과 반려인이 함께 안전하고 쾌적하게 교감할 수 있는 전용 놀이/훈련 시설',
+    icon: '12 반려동물 놀이터'
+  },
+  {
+    id: 'noise_barrier',
+    name: '방음벽',
+    description: '도심 교통 소음 및 산업 소음을 효과적으로 차단/흡음하는 친환경 방음벽 패널',
+    icon: '13 방음벽'
+  },
+  {
+    id: 'maintenance',
+    name: '시설물 보수',
+    description: '가로/공공 조경 시설물의 완벽한 사후 관리, 수리 및 부품 교체 보수 서비스',
+    icon: '14 시설물 보수'
+  },
+  {
+    id: 'other_facilities',
+    name: '기타 조경 시설물',
+    description: '볼라드, 플랜터, 경관 조명, 안내사인 등 다채로운 공공 가로 경관 조경 시설물',
+    icon: '15 기타 조경 시설물'
   }
 ];
 
@@ -91,6 +139,7 @@ export const defaultCompanyInfo: CompanyInfo = {
   asAlertEmail: 'dadmdesign@naver.com',
   catalogAlertEmail: 'dadmdesign@naver.com',
   narajangterMarkUrl: '',
+  newProductMarkUrl: '',
   enablePriceTab: true,
   enableCatalogTab: true,
   enableAsTab: true,
@@ -154,6 +203,7 @@ export const defaultProducts: Product[] = [
     categoryId: 'pergola',
     isProcurement: true,
     isSignature: true,
+    isNew: true,
     name: '디럭스 스마트 휴게 파고라',
     identificationNo: '23450912',
     size: 'W4500 x D3200 x H2900 (mm)',
@@ -227,6 +277,7 @@ export const defaultProducts: Product[] = [
     categoryId: 'bin',
     isProcurement: true,
     isSignature: true,
+    isNew: true,
     name: '디럭스 하이브리드 분리수거 쓰레기통',
     identificationNo: '21102934',
     size: 'W950 x D480 x H1020 (mm)',
@@ -273,6 +324,7 @@ export const defaultProducts: Product[] = [
     categoryId: 'pergola',
     isProcurement: true,
     isSignature: true,
+    isNew: true,
     name: '모던 큐빅 쉘터 파고라 (스틸&우드)',
     identificationNo: '23450915',
     size: 'W3600 x D3600 x H2700 (mm)',
@@ -516,6 +568,16 @@ export const defaultPopups: PopupItem[] = [
     createdAt: '2026-07-12'
   }
 ];
+
+export const defaultTypographySettings: TypographySettings = {
+  fontFamily: 'Pretendard',
+  headingFontFamily: 'inherit',
+  baseFontSizePercent: 100,
+  baseLetterSpacing: -0.015,
+  baseLineHeight: 1.6,
+  headingLetterSpacing: -0.025,
+  headingLineHeight: 1.3
+};
 
 
 

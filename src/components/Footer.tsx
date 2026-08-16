@@ -15,33 +15,33 @@ export default function Footer({ companyInfo, activePage, setActivePage }: Foote
       {/* Top row with helpful quick items */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-b border-neutral-800/60 flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex items-center space-x-3">
-          <span className="text-sm font-extrabold text-neutral-200 tracking-tight">DADMDESIGN 다듬디자인</span>
+          <span className="text-lg sm:text-xl font-extrabold text-neutral-200 tracking-tight">DADMDESIGN 다듬디자인</span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 text-neutral-300">
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-neutral-300">
           <button
             onClick={() => setActivePage('about')}
-            className="hover:text-white transition-colors cursor-pointer text-xs"
+            className="hover:text-white transition-colors cursor-pointer text-base font-medium"
           >
             회사소개
           </button>
           <button
             onClick={() => setActivePage('products')}
-            className="hover:text-white transition-colors cursor-pointer text-xs"
+            className="hover:text-white transition-colors cursor-pointer text-base font-medium"
           >
             제품소개
           </button>
           <button
             onClick={() => setActivePage('inquiry')}
-            className="hover:text-white transition-colors cursor-pointer text-xs"
+            className="hover:text-white transition-colors cursor-pointer text-base font-medium"
           >
             온라인견적문의
           </button>
           <button
             onClick={() => setActivePage('admin')}
-            className="flex items-center space-x-1 hover:text-white transition-colors cursor-pointer text-xs font-mono font-semibold"
+            className="flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer text-base font-mono font-semibold"
           >
-            <User size={12} />
+            <User size={16} />
             <span>ADMIN LOGIN</span>
           </button>
         </div>

@@ -16,6 +16,8 @@ export interface Product {
   hasPdf: boolean; // PDF 카탈로그 다운로드 여부
   isProcurement?: boolean; // 조달등록제품 여부
   isSignature?: boolean; // 시그니처 조달 우수제품 여부
+  isNew?: boolean; // 신제품 여부 (이미지 좌상단에 신제품 마크 표시)
+  newMarkImageUrl?: string; // 개별 제품 전용 신제품 마크 이미지 URL (시놀로지 NAS 링크 지원)
   designMaterialEnabled?: boolean; // 설계자료 다운로드 활성화 여부
   designMaterialUrl?: string; // 설계자료 다운로드 URL (시놀로지 나스 등)
   createdAt: string;
@@ -60,6 +62,7 @@ export interface CompanyInfo {
   subwayDirections?: string; // 지하철 이용 안내
   busDirections?: string; // 버스 이용 안내
   narajangterMarkUrl?: string; // 나라장터 마크 이미지 URL
+  newProductMarkUrl?: string; // 신제품 표시 마크 이미지 URL (시놀로지 NAS 지원)
   enablePriceTab?: boolean; // 가격자료 활성화 여부
   enableCatalogTab?: boolean; // 카탈로그 신청 활성화 여부
   enableAsTab?: boolean; // A/S 하자접수 활성화 여부
@@ -158,6 +161,16 @@ export interface PopupItem {
   left?: number;
   top?: number;
   createdAt: string;
+}
+
+export interface TypographySettings {
+  fontFamily: string; // e.g. 'Pretendard' | 'Noto Sans KR' | 'Nanum Gothic' | 'Nanum Myeongjo' | 'SUIT' | 'Spoqa Han Sans Neo' | 'Gmarket Sans' | 'System Sans'
+  headingFontFamily: string; // 'inherit' | font name
+  baseFontSizePercent: number; // 85 ~ 140 (default 100)
+  baseLetterSpacing: number; // -0.05 ~ +0.10 em (default -0.015)
+  baseLineHeight: number; // 1.2 ~ 2.2 (default 1.6)
+  headingLetterSpacing: number; // -0.08 ~ +0.10 em (default -0.025)
+  headingLineHeight: number; // 1.1 ~ 1.8 (default 1.3)
 }
 
 

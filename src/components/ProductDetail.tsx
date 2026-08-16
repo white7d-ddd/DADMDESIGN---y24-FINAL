@@ -78,6 +78,27 @@ export default function ProductDetail({
           <div className="lg:col-span-7 flex flex-col space-y-4">
             {/* Huge Main Image Display */}
             <div className="relative aspect-4/3 bg-neutral-100 rounded-xl overflow-hidden border border-neutral-100">
+              {/* NEW Product Badge on Top Left - Image or Text */}
+              {product.isNew && (
+                (product.newMarkImageUrl || companyInfo.newProductMarkUrl) ? (
+                  <div className="absolute top-3.5 left-3.5 z-10 max-h-11 max-w-[120px] flex items-center select-none pointer-events-none drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
+                    <img
+                      src={getDirectImageUrl(product.newMarkImageUrl || companyInfo.newProductMarkUrl || '')}
+                      alt="신제품"
+                      className="h-7 sm:h-9 w-auto object-contain"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                ) : (
+                  <span
+                    className="absolute top-3.5 left-3.5 z-10 text-red-600 font-sans font-black text-sm sm:text-base tracking-widest uppercase drop-shadow-[0_1px_3px_rgba(255,255,255,0.95)] select-none pointer-events-none"
+                    title="NEW"
+                  >
+                    NEW
+                  </span>
+                )
+              )}
+
               <img
                 src={getDirectImageUrl(product.images[activeImageIdx])}
                 alt={product.name}

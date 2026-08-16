@@ -9,11 +9,14 @@ import {
   defaultInstallationCases,
   defaultHomeSectionInfo,
   defaultPageHeaders,
-  defaultPopups
+  defaultPopups,
+  defaultTypographySettings
 } from './data/defaultData';
-import { Category, Product, Banner, CompanyInfo, Inquiry, ConstructionProject, HomeSectionInfo, PageHeaders, PopupItem } from './types';
+import { Category, Product, Banner, CompanyInfo, Inquiry, ConstructionProject, HomeSectionInfo, PageHeaders, PopupItem, TypographySettings } from './types';
 import { ICON_MAP, AVAILABLE_ICONS } from './utils/iconMap';
+import { migrateCategoryIcons } from './utils/categoryMigrator';
 import { sortProjectsByPeriod, sortHistoryByYear } from './utils/dateUtils';
+import { applyTypographyToDOM } from './utils/typography';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ProductCard from './components/ProductCard';
@@ -127,6 +130,25 @@ export default function App() {
   const [constructionProjects, setConstructionProjects] = useState<ConstructionProject[]>(defaultConstructionProjects);
   const [installationCases, setInstallationCases] = useState<ConstructionProject[]>(defaultInstallationCases);
   const [popups, setPopups] = useState<PopupItem[]>(defaultPopups);
+  const [typographySettings, setTypographySettings] = useState<TypographySettings>(() => {
+    const cached = localStorage.getItem('dadm_typography_settings');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed && typeof parsed === 'object') {
+          return { ...defaultTypographySettings, ...parsed };
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    return defaultTypographySettings;
+  });
+
+  // Apply typography to DOM whenever typographySettings changes
+  useEffect(() => {
+    applyTypographyToDOM(typographySettings);
+  }, [typographySettings]);
 
   // Dynamic Available Icons (Pictograms) State
   const [availableIcons, setAvailableIcons] = useState<{ name: string; label: string }[]>(() => {
@@ -295,6 +317,13 @@ export default function App() {
     saveServerDB({ popups: updatedPopups });
   };
 
+  const handleUpdateTypographySettings = (updatedTypography: TypographySettings) => {
+    setTypographySettings(updatedTypography);
+    safeSetLocalStorage('dadm_typography_settings', updatedTypography);
+    saveServerDB({ typographySettings: updatedTypography });
+    applyTypographyToDOM(updatedTypography);
+  };
+
   // Inquiry prefill triggers
   const [prefilledProductName, setPrefilledProductName] = useState('');
   const [prefilledProductId, setPrefilledProductId] = useState('');
@@ -329,7 +358,9 @@ export default function App() {
       try {
         const parsed = JSON.parse(cachedCategories);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setCategories(parsed);
+          const migrated = migrateCategoryIcons(parsed);
+          setCategories(migrated);
+          safeSetLocalStorage('dadm_categories', migrated);
         } else {
           setCategories(defaultCategories);
         }
@@ -493,8 +524,9 @@ export default function App() {
           safeSetLocalStorage('dadm_products', db.products);
         }
         if (Array.isArray(db.categories) && db.categories.length > 0) {
-          setCategories(db.categories);
-          safeSetLocalStorage('dadm_categories', db.categories);
+          const migrated = migrateCategoryIcons(db.categories);
+          setCategories(migrated);
+          safeSetLocalStorage('dadm_categories', migrated);
         }
         if (Array.isArray(db.banners) && db.banners.length > 0) {
           setBanners(db.banners);
@@ -531,6 +563,12 @@ export default function App() {
         if (Array.isArray(db.availableIcons) && db.availableIcons.length > 0) {
           setAvailableIcons(db.availableIcons);
           safeSetLocalStorage('dadm_available_icons', db.availableIcons);
+        }
+        if (db.typographySettings && typeof db.typographySettings === 'object') {
+          const mergedTypography = { ...defaultTypographySettings, ...db.typographySettings };
+          setTypographySettings(mergedTypography);
+          safeSetLocalStorage('dadm_typography_settings', mergedTypography);
+          applyTypographyToDOM(mergedTypography);
         }
         if (db.adminCredentials && db.adminCredentials.username && db.adminCredentials.password) {
           safeSetLocalStorage('dadm_admin_username', db.adminCredentials.username);
@@ -710,10 +748,10 @@ export default function App() {
               {/* Category Showcase Grid (Bento style) */}
               <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-6">
-                  <span className="text-neutral-400 font-mono text-[10px] uppercase font-bold tracking-widest">
+                  <span className="text-neutral-400 font-mono text-xs uppercase font-bold tracking-widest">
                     {homeSectionInfo.catShowcaseSlogan || 'DADMDESIGN Collections'}
                   </span>
-                  <h2 className="text-2xl font-black text-neutral-900 font-sans tracking-tight mt-1.5 flex items-center justify-center gap-2">
+                  <h2 className="text-[28px] sm:text-3xl font-black text-neutral-900 font-sans tracking-tight mt-2 flex items-center justify-center gap-2">
                     <span>{homeSectionInfo.catShowcaseTitle || '공간의 격을 높이는 가로 시설물 제품군'}</span>
                     {isAdminLoggedIn && (
                       <button
@@ -721,7 +759,7 @@ export default function App() {
                         className="inline-flex items-center justify-center p-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm border border-amber-400 transition-all cursor-pointer hover:scale-105"
                         title="메인화면 텍스트 수정 (팝업)"
                       >
-                        <Edit3 size={11} />
+                        <Edit3 size={13} />
                       </button>
                     )}
                   </h2>
@@ -741,8 +779,7 @@ export default function App() {
                 )}
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                  {categories.filter(c => c.id !== 'all' && c.isGeneral !== false).map((cat, idx) => {
-                    const count = products.filter(p => p.categoryId === cat.id).length;
+                  {categories.filter(c => c.id !== 'all' && c.isGeneral !== false).map((cat) => {
                     const isUrl = cat.icon && (cat.icon.startsWith('http') || cat.icon.startsWith('/'));
                     return (
                       <button
@@ -752,30 +789,27 @@ export default function App() {
                           setActivePage('products');
                           setSelectedProductId(null);
                         }}
-                        className="group bg-neutral-50 hover:bg-neutral-900 border border-neutral-200/60 rounded-3xl p-8 text-center transition-all hover:-translate-y-1.5 hover:shadow-lg duration-300 cursor-pointer flex flex-col justify-between h-52 relative"
+                        className="group bg-neutral-50 hover:bg-neutral-900 border border-neutral-200/60 rounded-3xl p-6 sm:p-7 text-center transition-all hover:-translate-y-1.5 hover:shadow-lg duration-300 cursor-pointer flex flex-col items-center justify-center gap-4 h-52 sm:h-56 relative"
                       >
-                        <div className="mx-auto bg-white group-hover:bg-neutral-800 p-5 rounded-2xl border border-neutral-100 group-hover:border-neutral-700 transition-colors shadow-sm flex items-center justify-center w-20 h-20 shrink-0">
+                        <div className="mx-auto bg-white group-hover:bg-neutral-800 p-3 rounded-2xl border border-neutral-100 group-hover:border-neutral-700 transition-colors shadow-sm flex items-center justify-center w-28 h-28 shrink-0">
                           {isUrl ? (
                             <img
                               src={cat.icon}
                               alt={cat.name}
-                              className="w-9 h-9 object-contain group-hover:invert group-hover:brightness-200 transition-all"
+                              className="w-[77px] h-[77px] object-contain group-hover:invert group-hover:brightness-200 transition-all"
                               referrerPolicy="no-referrer"
                             />
                           ) : (
                             (() => {
-                              const IconComponent = (cat.icon && ICON_MAP[cat.icon]) || Layers;
-                              return <IconComponent size={36} className="text-neutral-800 group-hover:text-white transition-colors" />;
+                              const IconComponent = (cat.icon && ICON_MAP[cat.icon]) || (cat.id && ICON_MAP[cat.id]) || (cat.name && ICON_MAP[cat.name]) || Layers;
+                              return <IconComponent size={68} className="text-neutral-800 group-hover:text-white transition-colors" />;
                             })()
                           )}
                         </div>
                         <div>
-                          <h3 className="text-sm sm:text-base font-extrabold text-neutral-950 group-hover:text-white font-sans transition-colors">
+                          <h3 className="text-base sm:text-lg font-black text-neutral-950 group-hover:text-white font-sans transition-colors tracking-tight">
                             {cat.name}
                           </h3>
-                          <span className="block text-[11px] text-neutral-400 group-hover:text-neutral-400 font-mono mt-1 font-bold">
-                            {count} 품종 수록
-                          </span>
                         </div>
                       </button>
                     );
@@ -787,11 +821,11 @@ export default function App() {
               <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-neutral-50/50 rounded-3xl py-12 border border-neutral-100">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
                   <div>
-                    <span className="text-xs font-mono font-bold tracking-wider text-neutral-400 uppercase">
+                    <span className="text-sm font-mono font-bold tracking-wider text-neutral-400 uppercase">
                       {homeSectionInfo.featuredSlogan || 'Featured Products'}
                     </span>
-                    <div className="flex flex-wrap items-center gap-3 mt-1">
-                      <h2 className="text-xl sm:text-2xl font-black text-neutral-950 font-sans tracking-tight flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-3 mt-1.5">
+                      <h2 className="text-2xl sm:text-[28px] font-black text-neutral-950 font-sans tracking-tight flex items-center gap-2">
                         <span>{homeSectionInfo.featuredTitle || '다듬디자인 시그니처 조달 우수제품'}</span>
                         {isAdminLoggedIn && (
                           <button
@@ -799,7 +833,7 @@ export default function App() {
                             className="inline-flex items-center justify-center p-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-sm border border-amber-400 transition-all cursor-pointer hover:scale-105"
                             title="메인화면 텍스트 수정 (팝업)"
                           >
-                            <Edit3 size={11} />
+                            <Edit3 size={13} />
                           </button>
                         )}
                       </h2>
@@ -807,7 +841,7 @@ export default function App() {
                       {/* Play / Pause Toggle Button */}
                       <button
                         onClick={() => setIsSigAutoPlaying(!isSigAutoPlaying)}
-                        className={`px-2.5 py-1.5 rounded-xl border flex items-center justify-center cursor-pointer transition-all ${
+                        className={`px-3 py-1.5 rounded-xl border flex items-center justify-center cursor-pointer transition-all ${
                           isSigAutoPlaying 
                             ? 'bg-neutral-950 text-white border-neutral-900 hover:bg-neutral-800' 
                             : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50 shadow-xs'
@@ -815,14 +849,14 @@ export default function App() {
                         title={isSigAutoPlaying ? "자동 재생 일시정지" : "자동 재생 시작 (2초 간격)"}
                       >
                         {isSigAutoPlaying ? (
-                          <div className="flex items-center space-x-1">
-                            <Pause size={11} className="stroke-[2.5px] animate-pulse text-amber-400" />
-                            <span className="text-[10px] font-sans font-black">2초 자동 재생 중</span>
+                          <div className="flex items-center space-x-1.5">
+                            <Pause size={13} className="stroke-[2.5px] animate-pulse text-amber-400" />
+                            <span className="text-xs font-sans font-black">2초 자동 재생 중</span>
                           </div>
                         ) : (
-                          <div className="flex items-center space-x-1">
-                            <Play size={11} className="stroke-[2.5px]" />
-                            <span className="text-[10px] font-sans font-bold">재생 일시정지</span>
+                          <div className="flex items-center space-x-1.5">
+                            <Play size={13} className="stroke-[2.5px]" />
+                            <span className="text-xs font-sans font-bold">재생 일시정지</span>
                           </div>
                         )}
                       </button>
@@ -850,10 +884,10 @@ export default function App() {
                         setSelectedCategory('all');
                         setSelectedProductId(null);
                       }}
-                      className="group flex items-center space-x-1.5 text-xs font-sans font-bold text-neutral-900 hover:text-neutral-700 transition-colors cursor-pointer bg-white px-4 py-2.5 rounded-xl border border-neutral-200/60 shadow-sm"
+                      className="group flex items-center space-x-1.5 text-sm font-sans font-bold text-neutral-900 hover:text-neutral-700 transition-colors cursor-pointer bg-white px-4 py-2.5 rounded-xl border border-neutral-200/60 shadow-sm"
                     >
                       <span>전체 수록 카탈로그 ({products.length})</span>
-                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
                 </div>
@@ -881,6 +915,8 @@ export default function App() {
                               setActivePage('products');
                             }}
                             isAdminLoggedIn={isAdminLoggedIn}
+                            narajangterMarkUrl={companyInfo.narajangterMarkUrl}
+                            newProductMarkUrl={companyInfo.newProductMarkUrl}
                             onEdit={() => {
                               setEditingProductData(p);
                               setIsProductModalOpen(true);
@@ -1123,6 +1159,7 @@ export default function App() {
                           onClick={() => setSelectedProductId(p.id)}
                           isAdminLoggedIn={isAdminLoggedIn}
                           narajangterMarkUrl={companyInfo.narajangterMarkUrl}
+                          newProductMarkUrl={companyInfo.newProductMarkUrl}
                           onEdit={() => {
                             setEditingProductData(p);
                             setIsProductModalOpen(true);
@@ -1182,7 +1219,7 @@ export default function App() {
                   <div className="flex space-x-6 sm:space-x-12">
                     <button
                       onClick={() => setAboutTab('philosophy')}
-                      className={`py-4 px-2 font-sans font-extrabold text-sm sm:text-base tracking-wide border-b-2 transition-colors cursor-pointer ${
+                      className={`py-4 px-3 font-sans font-black text-lg sm:text-xl tracking-wide border-b-2 transition-colors cursor-pointer ${
                         aboutTab === 'philosophy'
                           ? 'border-neutral-950 text-neutral-950'
                           : 'border-transparent text-neutral-400 hover:text-neutral-900'
@@ -1192,7 +1229,7 @@ export default function App() {
                     </button>
                     <button
                       onClick={() => setAboutTab('history')}
-                      className={`py-4 px-2 font-sans font-extrabold text-sm sm:text-base tracking-wide border-b-2 transition-colors cursor-pointer ${
+                      className={`py-4 px-3 font-sans font-black text-lg sm:text-xl tracking-wide border-b-2 transition-colors cursor-pointer ${
                         aboutTab === 'history'
                           ? 'border-neutral-950 text-neutral-950'
                           : 'border-transparent text-neutral-400 hover:text-neutral-900'
@@ -1202,7 +1239,7 @@ export default function App() {
                     </button>
                     <button
                       onClick={() => setAboutTab('directions')}
-                      className={`py-4 px-2 font-sans font-extrabold text-sm sm:text-base tracking-wide border-b-2 transition-colors cursor-pointer ${
+                      className={`py-4 px-3 font-sans font-black text-lg sm:text-xl tracking-wide border-b-2 transition-colors cursor-pointer ${
                         aboutTab === 'directions'
                           ? 'border-neutral-950 text-neutral-950'
                           : 'border-transparent text-neutral-400 hover:text-neutral-900'
@@ -1227,11 +1264,11 @@ export default function App() {
                     </div>
 
                     {/* GREETINGS & CORE NARRATIVE */}
-                    <div className="max-w-3xl mx-auto space-y-6">
-                      <h2 className="text-xl sm:text-2xl font-bold font-sans text-neutral-950 tracking-tight leading-snug border-b border-neutral-100 pb-4 text-center">
+                    <div className="max-w-4xl mx-auto space-y-8">
+                      <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-extrabold font-sans text-neutral-950 tracking-tight leading-snug border-b border-neutral-100 pb-5 text-center">
                         "{companyInfo.aboutUsTitle}"
                       </h2>
-                      <p className="text-xs sm:text-sm text-neutral-600 font-sans leading-relaxed whitespace-pre-line text-justify">
+                      <p className="text-base sm:text-lg md:text-xl text-neutral-700 font-sans leading-relaxed whitespace-pre-line text-justify">
                         {companyInfo.aboutUsText}
                       </p>
                     </div>
@@ -1243,26 +1280,26 @@ export default function App() {
                   <div className="space-y-12 animate-fade-in" id="about-tab-history">
                     <div className="relative border-l border-neutral-200 ml-4 md:ml-8 pl-8 sm:pl-12 space-y-12 py-4">
                       {(!companyInfo.historyList || companyInfo.historyList.length === 0) ? (
-                        <div className="text-center py-12 text-xs text-neutral-400 border border-dashed border-neutral-200 rounded-2xl font-sans">
+                        <div className="text-center py-12 text-sm sm:text-base text-neutral-400 border border-dashed border-neutral-200 rounded-2xl font-sans">
                           등록된 회사 연혁이 없습니다. 관리자 모드에서 연혁을 등록해주세요.
                         </div>
                       ) : (
                         sortHistoryByYear(companyInfo.historyList).map((item, idx) => (
                           <div key={item.id || idx} className="relative">
-                            <span className="absolute -left-[41px] sm:-left-[57px] top-1.5 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-neutral-950 text-white border border-white shadow-sm ring-4 ring-neutral-50 font-sans text-[10px] sm:text-xs font-black">
+                            <span className="absolute -left-[43px] sm:-left-[61px] top-1.5 flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-neutral-950 text-white border border-white shadow-sm ring-4 ring-neutral-50 font-sans text-xs sm:text-sm font-black">
                               {item.yearShort || (item.year ? item.year.slice(-2) : '')}
                             </span>
                             <div className="space-y-3">
                               {item.badge && (
-                                <span className="inline-block bg-neutral-100 text-neutral-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider font-sans">
+                                <span className="inline-block bg-neutral-100 text-neutral-800 text-xs sm:text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider font-sans">
                                   {item.badge}
                                 </span>
                               )}
-                              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 font-sans">
-                                {item.title} <span className="text-xs text-neutral-400 font-medium ml-1.5">({item.year}년)</span>
+                              <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 font-sans">
+                                {item.title} <span className="text-sm sm:text-base text-neutral-400 font-medium ml-2">({item.year}년)</span>
                               </h3>
                               {item.bullets && item.bullets.length > 0 && (
-                                <ul className="text-xs sm:text-sm text-neutral-500 space-y-1.5 list-disc pl-5 leading-relaxed font-sans">
+                                <ul className="text-sm sm:text-base text-neutral-600 space-y-2 list-disc pl-5 leading-relaxed font-sans">
                                   {item.bullets.map((bullet, bIdx) => (
                                     <li key={bIdx}>{bullet}</li>
                                   ))}
@@ -1281,28 +1318,28 @@ export default function App() {
                   <div className="space-y-10 animate-fade-in" id="about-tab-directions">
                     {/* CORPORATE INFORMATION TABLE */}
                     <div className="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-10 shadow-sm space-y-6">
-                      <h3 className="text-base font-bold text-neutral-950 font-sans border-b border-neutral-100 pb-4">
+                      <h3 className="text-lg sm:text-xl font-extrabold text-neutral-950 font-sans border-b border-neutral-100 pb-4">
                         본사 및 공장 소재지 정보
                       </h3>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-5 text-xs sm:text-sm font-sans">
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6 text-sm sm:text-base font-sans">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">상호명</span>
                           <span className="text-neutral-900 font-bold text-right">{companyInfo.name}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">대표전화</span>
                           <span className="text-neutral-900 font-mono font-bold text-right">{companyInfo.tel}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">대표자</span>
                           <span className="text-neutral-900 font-medium text-right">{companyInfo.representative}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">팩스번호</span>
                           <span className="text-neutral-900 font-mono text-right">{companyInfo.fax || '정보 없음'}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">홈페이지</span>
                           <span className="text-neutral-900 font-mono text-right">
                             <a href={companyInfo.website || 'http://www.dadmdesign.co.kr'} target="_blank" rel="noopener noreferrer" className="hover:underline text-neutral-900">
@@ -1310,15 +1347,15 @@ export default function App() {
                             </a>
                           </span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">이메일</span>
                           <span className="text-neutral-900 font-mono text-right">{companyInfo.email}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5 gap-4">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3 gap-4">
                           <span className="text-neutral-400 font-medium shrink-0">본사</span>
                           <span className="text-neutral-900 font-medium text-right">{companyInfo.address}</span>
                         </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-2.5 gap-4">
+                        <div className="flex justify-between border-b border-neutral-50 pb-3 gap-4">
                           <span className="text-neutral-400 font-medium shrink-0">공장</span>
                           <span className="text-neutral-900 font-medium text-right">{companyInfo.factoryAddress || '경북 김천 영남대로3251'}</span>
                         </div>
@@ -1335,7 +1372,7 @@ export default function App() {
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
-                                <h4 className="text-sm font-bold text-neutral-900 font-sans break-all">본사 : {companyInfo.address}</h4>
+                                <h4 className="text-base sm:text-lg font-extrabold text-neutral-900 font-sans break-all">본사 : {companyInfo.address}</h4>
                               </div>
                             </div>
 
@@ -1362,7 +1399,7 @@ export default function App() {
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
-                                <h4 className="text-sm font-bold text-neutral-900 font-sans break-all">공장 : {companyInfo.factoryAddress || '경북 김천 영남대로3251'}</h4>
+                                <h4 className="text-base sm:text-lg font-extrabold text-neutral-900 font-sans break-all">공장 : {companyInfo.factoryAddress || '경북 김천 영남대로3251'}</h4>
                               </div>
                             </div>
 
@@ -1449,6 +1486,8 @@ export default function App() {
                 onUpdateAvailableIcons={handleUpdateAvailableIcons}
                 popups={popups}
                 onUpdatePopups={handleUpdatePopups}
+                typographySettings={typographySettings}
+                onUpdateTypographySettings={handleUpdateTypographySettings}
               />
             </motion.div>
           )}

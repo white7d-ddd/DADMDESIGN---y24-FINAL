@@ -20,12 +20,14 @@ import {
   User,
   UserCog,
   MessageSquare,
-  Upload
+  Upload,
+  Type
 } from 'lucide-react';
-import { Product, Banner, CompanyInfo, Inquiry, Category, HomeSectionInfo, PopupItem } from '../types';
+import { Product, Banner, CompanyInfo, Inquiry, Category, HomeSectionInfo, PopupItem, TypographySettings } from '../types';
 import { getDirectImageUrl, convertSynologyToDirectUrl } from '../utils/imageUtils';
 import { ICON_MAP } from '../utils/iconMap';
 import { HomeSectionModal } from './AdminModals';
+import AdminTypographyTab from './AdminTypographyTab';
 
 interface AdminPanelProps {
   products: Product[];
@@ -47,9 +49,11 @@ interface AdminPanelProps {
   onUpdateAvailableIcons?: (icons: { name: string; label: string }[]) => void;
   popups?: PopupItem[];
   onUpdatePopups?: (popups: PopupItem[]) => void;
+  typographySettings?: TypographySettings;
+  onUpdateTypographySettings?: (settings: TypographySettings) => void;
 }
 
-type AdminTab = 'products' | 'categories' | 'banners' | 'company' | 'home' | 'inquiries' | 'backup' | 'security' | 'popups';
+type AdminTab = 'products' | 'categories' | 'banners' | 'company' | 'home' | 'inquiries' | 'backup' | 'security' | 'popups' | 'typography';
 
 export default function AdminPanel({
   products,
@@ -70,7 +74,9 @@ export default function AdminPanel({
   availableIcons,
   onUpdateAvailableIcons,
   popups = [],
-  onUpdatePopups
+  onUpdatePopups,
+  typographySettings,
+  onUpdateTypographySettings
 }: AdminPanelProps) {
   // Admin credentials state loaded from localStorage
   const [adminUsername, setAdminUsername] = useState(() => {
@@ -108,6 +114,7 @@ export default function AdminPanel({
   // Form Fields State - Categories
   const [isEditingCategory, setIsEditingCategory] = useState<Category | null>(null);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [catDeleteConfirmId, setCatDeleteConfirmId] = useState<string | null>(null);
   const [catId, setCatId] = useState('');
   const [catName, setCatName] = useState('');
   const [catDescription, setCatDescription] = useState('');
@@ -150,6 +157,8 @@ export default function AdminPanel({
   const [pHasPdf, setPHasPdf] = useState(true);
   const [pIsProcurement, setPIsProcurement] = useState(true);
   const [pIsSignature, setPIsSignature] = useState(true);
+  const [pIsNew, setPIsNew] = useState(false);
+  const [pNewMarkImageUrl, setPNewMarkImageUrl] = useState('');
   const [pDesignMaterialEnabled, setPDesignMaterialEnabled] = useState(false);
   const [pDesignMaterialUrl, setPDesignMaterialUrl] = useState('');
   const [pImageUrls, setPImageUrls] = useState<string[]>(['']);
@@ -171,6 +180,7 @@ export default function AdminPanel({
   const [cAboutUsText, setCAboutUsText] = useState(companyInfo.aboutUsText);
   const [cAboutUsImage, setCAboutUsImage] = useState(companyInfo.aboutUsImage || '/src/assets/images/street_bench_1783302667162.jpg');
   const [cNarajangterMarkUrl, setCNarajangterMarkUrl] = useState(companyInfo.narajangterMarkUrl || '');
+  const [cNewProductMarkUrl, setCNewProductMarkUrl] = useState(companyInfo.newProductMarkUrl || '');
   const [cEnablePriceTab, setCEnablePriceTab] = useState(companyInfo.enablePriceTab ?? true);
   const [cEnableCatalogTab, setCEnableCatalogTab] = useState(companyInfo.enableCatalogTab ?? true);
   const [cEnableAsTab, setCEnableAsTab] = useState(companyInfo.enableAsTab ?? true);
@@ -193,6 +203,7 @@ export default function AdminPanel({
       setCAboutUsText(companyInfo.aboutUsText || '');
       setCAboutUsImage(companyInfo.aboutUsImage || '');
       setCNarajangterMarkUrl(companyInfo.narajangterMarkUrl || '');
+      setCNewProductMarkUrl(companyInfo.newProductMarkUrl || '');
       setCEnablePriceTab(companyInfo.enablePriceTab ?? true);
       setCEnableCatalogTab(companyInfo.enableCatalogTab ?? true);
       setCEnableAsTab(companyInfo.enableAsTab ?? true);
@@ -366,6 +377,8 @@ export default function AdminPanel({
     setPHasPdf(true);
     setPIsProcurement(true);
     setPIsSignature(true);
+    setPIsNew(false);
+    setPNewMarkImageUrl('');
     setPDesignMaterialEnabled(false);
     setPDesignMaterialUrl('');
     setPImageUrls(['https://picsum.photos/seed/' + Math.floor(Math.random() * 100) + '/800/600']);
@@ -391,6 +404,8 @@ export default function AdminPanel({
     setPHasPdf(prod.hasPdf);
     setPIsProcurement(prod.isProcurement !== false);
     setPIsSignature(prod.isSignature || false);
+    setPIsNew(prod.isNew || false);
+    setPNewMarkImageUrl(prod.newMarkImageUrl || '');
     setPDesignMaterialEnabled(prod.designMaterialEnabled || false);
     setPDesignMaterialUrl(prod.designMaterialUrl || '');
     setPImageUrls(prod.images.length > 0 ? prod.images : ['https://picsum.photos/seed/edit/800/600']);
@@ -451,6 +466,8 @@ export default function AdminPanel({
         hasPdf: pHasPdf,
         isProcurement: pIsProcurement,
         isSignature: pIsSignature,
+        isNew: pIsNew,
+        newMarkImageUrl: pIsNew && pNewMarkImageUrl.trim() ? convertSynologyToDirectUrl(pNewMarkImageUrl.trim()) : undefined,
         designMaterialEnabled: pDesignMaterialEnabled,
         designMaterialUrl: convertSynologyUrl(pDesignMaterialUrl),
         createdAt: new Date().toISOString().split('T')[0]
@@ -477,6 +494,8 @@ export default function AdminPanel({
             hasPdf: pHasPdf,
             isProcurement: pIsProcurement,
             isSignature: pIsSignature,
+            isNew: pIsNew,
+            newMarkImageUrl: pIsNew && pNewMarkImageUrl.trim() ? convertSynologyToDirectUrl(pNewMarkImageUrl.trim()) : undefined,
             designMaterialEnabled: pDesignMaterialEnabled,
             designMaterialUrl: convertSynologyUrl(pDesignMaterialUrl)
           };
@@ -523,6 +542,7 @@ export default function AdminPanel({
       asAlertEmail: cAsAlertEmail,
       catalogAlertEmail: cCatalogAlertEmail,
       narajangterMarkUrl: cNarajangterMarkUrl,
+      newProductMarkUrl: cNewProductMarkUrl,
       enablePriceTab: cEnablePriceTab,
       enableCatalogTab: cEnableCatalogTab,
       enableAsTab: cEnableAsTab,
@@ -659,20 +679,12 @@ export default function AdminPanel({
   // Delete Category
   const handleDeleteCategory = (id: string) => {
     if (id === 'all') {
-      alert('전체상품 분류는 기본 시스템 분류로 삭제할 수 없습니다.');
       return;
     }
-    const hasProducts = products.some(p => p.categoryId === id);
-    let confirmMsg = '정말로 이 카테고리를 삭제하시겠습니까?';
-    if (hasProducts) {
-      confirmMsg = '주의! 이 카테고리에 소속된 제품들이 존재합니다. 카테고리를 삭제하면 소속된 제품들의 분류 필터링이 비정상적으로 동작할 수 있습니다. 그래도 정말 삭제하시겠습니까?';
+    if (onUpdateCategories) {
+      onUpdateCategories(categories.filter(c => c.id !== id));
     }
-    
-    if (window.confirm(confirmMsg)) {
-      if (onUpdateCategories) {
-        onUpdateCategories(categories.filter(c => c.id !== id));
-      }
-    }
+    setCatDeleteConfirmId(null);
   };
 
   // Add Pictogram to library
@@ -745,7 +757,8 @@ export default function AdminPanel({
       categories,
       banners,
       companyInfo,
-      inquiries
+      inquiries,
+      typographySettings
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
     const downloadAnchor = document.createElement('a');
@@ -773,6 +786,9 @@ export default function AdminPanel({
             onUpdateCategories(parsed.categories);
           }
           if (parsed.inquiries) onUpdateInquiries(parsed.inquiries);
+          if (parsed.typographySettings && onUpdateTypographySettings) {
+            onUpdateTypographySettings(parsed.typographySettings);
+          }
           alert('가상 데이터베이스 복원이 성공적으로 완료되었습니다! 웹사이트 내용이 즉시 갱신되었습니다.');
           window.location.reload();
         } else {
@@ -984,6 +1000,19 @@ export default function AdminPanel({
               >
                 <MessageSquare size={15} className="text-amber-500" />
                 <span>메인 팝업 공지 제어 ({popups.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('typography')}
+                className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-left cursor-pointer ${
+                  activeTab === 'typography'
+                    ? 'bg-neutral-900 text-white font-bold shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                }`}
+                id="admin-tab-typography-btn"
+              >
+                <Type size={15} className="text-amber-500" />
+                <span>폰트 & 텍스트 스타일 제어</span>
               </button>
             </div>
 
@@ -1315,7 +1344,7 @@ export default function AdminPanel({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
                       <div className="flex items-center space-x-3">
                         <input
                           type="checkbox"
@@ -1324,7 +1353,7 @@ export default function AdminPanel({
                           onChange={(e) => setPIsProcurement(e.target.checked)}
                           className="h-4 w-4 text-neutral-900 border-neutral-300 rounded focus:ring-neutral-900"
                         />
-                        <label htmlFor="procurement-allowed" className="text-xs font-bold text-emerald-700">조달등록제품으로 등재</label>
+                        <label htmlFor="procurement-allowed" className="text-xs font-bold text-emerald-700 cursor-pointer">조달등록제품으로 등재</label>
                       </div>
                       <div className="flex items-center space-x-3">
                         <input
@@ -1334,9 +1363,92 @@ export default function AdminPanel({
                           onChange={(e) => setPIsSignature(e.target.checked)}
                           className="h-4 w-4 text-neutral-900 border-neutral-300 rounded focus:ring-neutral-900"
                         />
-                        <label htmlFor="signature-allowed" className="text-xs font-bold text-amber-700">메인페이지 게시</label>
+                        <label htmlFor="signature-allowed" className="text-xs font-bold text-amber-700 cursor-pointer">메인페이지 게시</label>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          id="new-product-allowed"
+                          checked={pIsNew}
+                          onChange={(e) => setPIsNew(e.target.checked)}
+                          className="h-4 w-4 text-red-600 border-neutral-300 rounded focus:ring-red-600"
+                        />
+                        <label htmlFor="new-product-allowed" className="text-xs font-bold text-red-600 cursor-pointer flex items-center space-x-1">
+                          <span>신제품으로 지정</span>
+                          <span className="text-[10px] text-red-500 font-medium">(마크 표기)</span>
+                        </label>
                       </div>
                     </div>
+
+                    {/* 신제품 개별 마크 이미지 설정 (시놀로지 NAS 지원) */}
+                    {pIsNew && (
+                      <div className="bg-red-50/50 p-4 rounded-xl border border-red-200/70 space-y-3 animate-fade-in">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                          <div className="md:col-span-3">
+                            <label className="block text-xs font-bold text-red-900 mb-1.5 flex items-center justify-between">
+                              <span>개별 제품 전용 신제품 마크 이미지 URL (선택)</span>
+                              <span className="px-1.5 py-0.5 bg-amber-500 text-neutral-950 font-bold rounded text-[9px] uppercase font-sans">Synology NAS 지원</span>
+                            </label>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                value={pNewMarkImageUrl}
+                                onChange={(e) => setPNewMarkImageUrl(e.target.value)}
+                                onBlur={(e) => {
+                                  const converted = convertSynologyToDirectUrl(e.target.value);
+                                  if (converted !== e.target.value) {
+                                    setPNewMarkImageUrl(converted);
+                                  }
+                                }}
+                                placeholder="시놀로지 NAS 공유 링크 또는 이미지 직링크 (미입력 시 기본 마크/NEW 표기)"
+                                className="w-full text-xs px-3.5 py-2.5 border border-red-200 bg-white rounded-lg focus:outline-none focus:border-red-600 font-mono"
+                              />
+                              <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3.5 py-2.5 rounded-lg cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                                <Upload size={13} />
+                                <span>파일 선택</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    const reader = new FileReader();
+                                    reader.onload = (event) => {
+                                      if (event.target?.result) {
+                                        setPNewMarkImageUrl(event.target.result as string);
+                                      }
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }}
+                                />
+                              </label>
+                            </div>
+                            <p className="text-[10px] text-red-700/80 mt-1">
+                              💡 시놀로지 NAS 파일 공유 링크(<code className="bg-red-100 px-1 py-0.5 rounded font-mono">gofile.me/...</code> 등)를 넣으시면 이미지 주소로 자동 변환됩니다.
+                            </p>
+                          </div>
+                          <div className="md:col-span-1 bg-white p-2 rounded-lg border border-red-200 flex flex-col items-center justify-center">
+                            <span className="text-[9px] font-bold text-neutral-400 mb-1 block w-full text-center uppercase">마크 미리보기</span>
+                            <div className="relative h-10 w-full rounded-lg overflow-hidden border border-neutral-200 bg-neutral-50 flex items-center justify-center p-1">
+                              {pNewMarkImageUrl ? (
+                                <img
+                                  src={getDirectImageUrl(pNewMarkImageUrl)}
+                                  alt="신제품 마크 미리보기"
+                                  className="h-full w-auto object-contain"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback-mark/50/50';
+                                  }}
+                                  referrerPolicy="no-referrer"
+                                />
+                              ) : (
+                                <span className="text-red-600 font-black text-xs font-sans tracking-widest">NEW</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* 설계자료 다운로드 설정 (시놀로지 나스 등) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
@@ -1600,22 +1712,41 @@ export default function AdminPanel({
                               <td className="py-3.5 px-4 text-right">
                                 <div className="flex items-center justify-end space-x-1.5">
                                   {cat.id !== 'all' ? (
-                                    <>
-                                      <button
-                                        onClick={() => openEditCategory(cat)}
-                                        className="p-1.5 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-all cursor-pointer"
-                                        title="카테고리 수정"
-                                      >
-                                        <Edit2 size={13} />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteCategory(cat.id)}
-                                        className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
-                                        title="카테고리 삭제"
-                                      >
-                                        <Trash2 size={13} />
-                                      </button>
-                                    </>
+                                    catDeleteConfirmId === cat.id ? (
+                                      <div className="flex items-center space-x-1.5 animate-fade-in">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDeleteCategory(cat.id)}
+                                          className="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer"
+                                        >
+                                          삭제 확인
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setCatDeleteConfirmId(null)}
+                                          className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-600 rounded-lg text-xs font-bold cursor-pointer"
+                                        >
+                                          취소
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <button
+                                          onClick={() => openEditCategory(cat)}
+                                          className="p-1.5 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-all cursor-pointer"
+                                          title="카테고리 수정"
+                                        >
+                                          <Edit2 size={13} />
+                                        </button>
+                                        <button
+                                          onClick={() => setCatDeleteConfirmId(cat.id)}
+                                          className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+                                          title="카테고리 삭제"
+                                        >
+                                          <Trash2 size={13} />
+                                        </button>
+                                      </>
+                                    )
                                   ) : (
                                     <span className="text-[10px] text-neutral-400 font-bold px-2 py-1 bg-neutral-100 rounded-md select-none font-sans">
                                       시스템 기본
@@ -2289,6 +2420,76 @@ export default function AdminPanel({
                               />
                             </svg>
                           )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 공통 신제품 표시 마크 이미지 URL */}
+                    <div className="border-t border-neutral-100 pt-6 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="md:col-span-3">
+                          <label className="block text-xs font-bold text-neutral-500 mb-1.5 flex items-center justify-between">
+                            <span>공통 신제품 표시 마크 이미지 URL (선택)</span>
+                            <span className="px-1.5 py-0.5 bg-amber-500 text-neutral-950 font-bold rounded text-[9px] uppercase font-sans">Synology NAS 지원</span>
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={cNewProductMarkUrl}
+                              onChange={(e) => setCNewProductMarkUrl(e.target.value)}
+                              onBlur={(e) => {
+                                const converted = convertSynologyToDirectUrl(e.target.value);
+                                if (converted !== e.target.value) {
+                                  setCNewProductMarkUrl(converted);
+                                }
+                              }}
+                              placeholder="시놀로지 파일 링크 또는 마크 이미지 URL (미입력 시 기본 NEW 텍스트 표기)"
+                              className="w-full text-xs sm:text-sm px-4 py-2.5 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 font-mono"
+                            />
+                            <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3.5 py-2.5 rounded-lg cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                              <Upload size={13} />
+                              <span>파일 선택</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  const reader = new FileReader();
+                                  reader.onload = (event) => {
+                                    if (event.target?.result) {
+                                      setCNewProductMarkUrl(event.target.result as string);
+                                    }
+                                  };
+                                  reader.readAsDataURL(file);
+                                }}
+                              />
+                            </label>
+                          </div>
+                          <p className="text-[10px] text-neutral-400 mt-1 leading-relaxed">
+                            신제품으로 지정된 제품의 이미지 좌측 상단에 오버레이로 표시될 마크 이미지를 설정합니다. 
+                            시놀로지 NAS 공유 링크(<code className="bg-neutral-100 px-1 py-0.5 rounded font-mono">/sharing/</code> 또는 <code className="bg-neutral-100 px-1 py-0.5 rounded font-mono">gofile.me/...</code>)를 지원합니다.
+                          </p>
+                        </div>
+
+                        <div className="md:col-span-1 bg-neutral-50 p-2.5 rounded-xl border border-neutral-200/60 flex flex-col items-center justify-center">
+                          <span className="text-[9px] font-bold text-neutral-400 mb-1.5 block w-full text-center uppercase tracking-wide">마크 프리뷰</span>
+                          <div className="relative h-12 w-full rounded-lg overflow-hidden border border-neutral-200 bg-white shadow-sm p-1.5 flex items-center justify-center">
+                            {cNewProductMarkUrl ? (
+                              <img
+                                src={getDirectImageUrl(cNewProductMarkUrl)}
+                                alt="신제품 마크 프리뷰"
+                                className="h-full w-auto object-contain"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback-mark/50/50';
+                                }}
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <span className="text-red-600 font-black text-sm font-sans tracking-widest">NEW</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3346,6 +3547,14 @@ export default function AdminPanel({
                   </form>
                 )}
               </div>
+            )}
+
+            {/* TAB: TYPOGRAPHY & TEXT STYLES CONTROL */}
+            {activeTab === 'typography' && (
+              <AdminTypographyTab
+                typographySettings={typographySettings}
+                onUpdateTypographySettings={onUpdateTypographySettings}
+              />
             )}
 
           </div>

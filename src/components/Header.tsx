@@ -90,7 +90,7 @@ export default function Header({
               <button
                 id="nav-about"
                 onClick={() => handleNav('about', undefined, 'philosophy')}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-sm lg:text-base xl:text-lg tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'about'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -103,19 +103,19 @@ export default function Header({
               <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <button
                   onClick={() => handleNav('about', undefined, 'philosophy')}
-                  className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
                   인사말
                 </button>
                 <button
                   onClick={() => handleNav('about', undefined, 'history')}
-                  className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
-                  연혁
+                  회사연혁
                 </button>
                 <button
                   onClick={() => handleNav('about', undefined, 'directions')}
-                  className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
                   오시는 길
                 </button>
@@ -127,7 +127,7 @@ export default function Header({
               <button
                 id="nav-procurement"
                 onClick={() => handleNav('procurement')}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-sm lg:text-base xl:text-lg tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'procurement'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -142,7 +142,7 @@ export default function Header({
                   <button
                     key={`proc-${cat.id}`}
                     onClick={() => handleNav('procurement', cat.id)}
-                    className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                    className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                   >
                     {cat.name}
                   </button>
@@ -155,7 +155,7 @@ export default function Header({
               <button
                 id="nav-products"
                 onClick={() => handleNav('products')}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-sm lg:text-base xl:text-lg tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'products'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -170,7 +170,7 @@ export default function Header({
                   <button
                     key={`prod-${cat.id}`}
                     onClick={() => handleNav('products', cat.id)}
-                    className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                    className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                   >
                     {cat.name}
                   </button>
@@ -182,7 +182,7 @@ export default function Header({
             <button
               id="nav-cases"
               onClick={() => handleNav('cases')}
-              className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-sm lg:text-base xl:text-lg tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+              className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                 activePage === 'cases'
                   ? 'text-neutral-900 border-b-2 border-neutral-900'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -196,7 +196,7 @@ export default function Header({
               <button
                 id="nav-inquiry"
                 onClick={() => handleNav('inquiry', undefined, undefined, defaultInquiryTab)}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-sm lg:text-base xl:text-lg tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'inquiry'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -211,7 +211,7 @@ export default function Header({
                   {showPriceTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
-                      className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                     >
                       가격자료
                     </button>
@@ -219,7 +219,7 @@ export default function Header({
                   {showCatalogTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'catalog')}
-                      className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                     >
                       카탈로그 신청
                     </button>
@@ -227,7 +227,7 @@ export default function Header({
                   {showAsTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'as')}
-                      className="block w-full text-left px-4 py-2 text-xs lg:text-sm font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                     >
                       A/S 하자접수
                     </button>
@@ -240,7 +240,7 @@ export default function Header({
             <button
               id="nav-construction"
               onClick={() => handleNav('construction')}
-              className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-sm lg:text-base xl:text-lg tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+              className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                 activePage === 'construction'
                   ? 'text-neutral-900 border-b-2 border-neutral-900'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -274,7 +274,7 @@ export default function Header({
               <button
                 id="mobile-nav-about"
                 onClick={() => toggleSection('about')}
-                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-[15.5px] font-bold transition-colors cursor-pointer ${
                   activePage === 'about' ? 'bg-neutral-50 text-neutral-950 font-black' : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >
@@ -290,19 +290,19 @@ export default function Header({
                 <div className="pl-3 pr-2 mt-1 py-1 space-y-1 bg-neutral-50/60 rounded-xl border border-neutral-100/60 animate-fade-in">
                   <button
                     onClick={() => handleNav('about', undefined, 'philosophy')}
-                    className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                    className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                   >
                     인사말
                   </button>
                   <button
                     onClick={() => handleNav('about', undefined, 'history')}
-                    className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                    className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                   >
-                    연혁
+                    회사연혁
                   </button>
                   <button
                     onClick={() => handleNav('about', undefined, 'directions')}
-                    className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                    className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                   >
                     오시는 길
                   </button>
@@ -314,7 +314,7 @@ export default function Header({
             <div className="border-b border-gray-100 pb-2.5">
               <button
                 onClick={() => toggleSection('procurement')}
-                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-[15.5px] font-bold transition-colors cursor-pointer ${
                   activePage === 'procurement' ? 'bg-neutral-50 text-neutral-950 font-black' : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >
@@ -332,7 +332,7 @@ export default function Header({
                     <button
                       key={`mob-proc-${cat.id}`}
                       onClick={() => handleNav('procurement', cat.id)}
-                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                     >
                       {cat.name}
                     </button>
@@ -345,7 +345,7 @@ export default function Header({
             <div className="border-b border-gray-100 pb-2.5">
               <button
                 onClick={() => toggleSection('products')}
-                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-[15.5px] font-bold transition-colors cursor-pointer ${
                   activePage === 'products' ? 'bg-neutral-50 text-neutral-950 font-black' : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >
@@ -363,7 +363,7 @@ export default function Header({
                     <button
                       key={`mob-prod-${cat.id}`}
                       onClick={() => handleNav('products', cat.id)}
-                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                     >
                       {cat.name}
                     </button>
@@ -377,7 +377,7 @@ export default function Header({
               <button
                 id="mobile-nav-cases"
                 onClick={() => handleNav('cases')}
-                className={`block w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                className={`block w-full text-left px-3 py-2.5 rounded-lg text-[15.5px] font-bold transition-colors cursor-pointer ${
                   activePage === 'cases' ? 'bg-neutral-950 text-white font-black' : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >
@@ -395,7 +395,7 @@ export default function Header({
                     toggleSection('inquiry');
                   }
                 }}
-                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                className={`flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-[15.5px] font-bold transition-colors cursor-pointer ${
                   activePage === 'inquiry' ? 'bg-neutral-50 text-neutral-950 font-black' : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >
@@ -414,7 +414,7 @@ export default function Header({
                   {showPriceTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
-                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                     >
                       가격자료
                     </button>
@@ -422,7 +422,7 @@ export default function Header({
                   {showCatalogTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'catalog')}
-                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                     >
                       카탈로그 신청
                     </button>
@@ -430,7 +430,7 @@ export default function Header({
                   {showAsTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'as')}
-                      className="block w-full text-left px-4 py-2 text-xs sm:text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
+                      className="block w-full text-left px-4 py-2 text-[13px] sm:text-[15.5px] font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100/70 rounded-lg transition-all cursor-pointer"
                     >
                       A/S 하자접수
                     </button>
@@ -444,7 +444,7 @@ export default function Header({
               <button
                 id="mobile-nav-construction"
                 onClick={() => handleNav('construction')}
-                className={`block w-full text-left px-3 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                className={`block w-full text-left px-3 py-2.5 rounded-lg text-[15.5px] font-bold transition-colors cursor-pointer ${
                   activePage === 'construction' ? 'bg-neutral-950 text-white font-black' : 'text-neutral-700 hover:bg-neutral-50'
                 }`}
               >

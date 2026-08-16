@@ -1,5 +1,23 @@
 import React from 'react';
 import {
+  PICTOGRAM_MAP,
+  PictogramTraditionalPavilion,
+  PictogramPergola,
+  PictogramRecycleStation,
+  PictogramBicycleRack,
+  PictogramOutdoorBench,
+  PictogramTreeBench,
+  PictogramBusShelter,
+  PictogramKidsBusShelter,
+  PictogramOutdoorFitness,
+  PictogramFence,
+  PictogramPlayground,
+  PictogramPetPark,
+  PictogramNoiseBarrier,
+  PictogramMaintenance,
+  PictogramLandscapeFacilities
+} from '../components/Pictograms';
+import {
   Grid,
   Layers,
   Warehouse,
@@ -60,6 +78,25 @@ import {
 } from 'lucide-react';
 
 export const ICON_MAP: Record<string, React.ComponentType<any>> = {
+  // Custom Pictograms
+  ...PICTOGRAM_MAP,
+  PictogramTraditionalPavilion,
+  PictogramPergola,
+  PictogramRecycleStation,
+  PictogramBicycleRack,
+  PictogramOutdoorBench,
+  PictogramTreeBench,
+  PictogramBusShelter,
+  PictogramKidsBusShelter,
+  PictogramOutdoorFitness,
+  PictogramFence,
+  PictogramPlayground,
+  PictogramPetPark,
+  PictogramNoiseBarrier,
+  PictogramMaintenance,
+  PictogramLandscapeFacilities,
+
+  // Lucide Icons
   Grid,
   Layers,
   Warehouse,
@@ -120,6 +157,24 @@ export const ICON_MAP: Record<string, React.ComponentType<any>> = {
 };
 
 export const AVAILABLE_ICONS = [
+  // 15 New Custom Pictograms Top Priority
+  { name: '1전통정자', label: '1. 전통정자 (팔각정/사각정)' },
+  { name: '2 파고라', label: '2. 파고라 (모던쉼터)' },
+  { name: '3 분리수거장', label: '3. 분리수거장 (재활용쉘터)' },
+  { name: '4 자전거 보관대', label: '4. 자전거 보관대 (거치대)' },
+  { name: '5 옥외용 벤치', label: '5. 옥외용 벤치 (야외의자)' },
+  { name: '6 수목보호의자', label: '6. 수목보호의자 (원형벤치)' },
+  { name: '7 버스승강장', label: '7. 버스승강장 (쉘터/표지판)' },
+  { name: '8 어린이 버스승강장', label: '8. 어린이 버스승강장 (키즈쉘터)' },
+  { name: '9 야외운동시설', label: '9. 야외운동시설 (헬스기구)' },
+  { name: '10 휀스', label: '10. 휀스 (안전울타리)' },
+  { name: '11 어린이놀이터', label: '11. 어린이놀이터 (조합놀이대)' },
+  { name: '12 반려동물 놀이터', label: '12. 반려동물 놀이터 (어질리티)' },
+  { name: '13 방음벽', label: '13. 방음벽 (흡음/차음패널)' },
+  { name: '14 시설물 보수', label: '14. 시설물 보수 (A/S수리)' },
+  { name: '15 기타 조경 시설물', label: '15. 기타 조경 시설물 (복합가로)' },
+
+  // General Icons
   { name: 'Grid', label: '기본 그리드 (전체)' },
   { name: 'Layers', label: '레이어 (복합시설)' },
   { name: 'Umbrella', label: '파라솔/그늘막 (파고라)' },
