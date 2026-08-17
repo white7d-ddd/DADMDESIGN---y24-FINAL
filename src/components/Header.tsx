@@ -66,7 +66,7 @@ export default function Header({
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 relative">
+        <div className="flex justify-between items-center h-20 md:h-24 relative">
           
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center z-10">
@@ -76,21 +76,21 @@ export default function Header({
               id="header-logo-btn"
             >
               <div>
-                <span className="block text-3xl font-black font-sans tracking-tighter text-neutral-900 leading-none hover:text-neutral-700 transition-colors">
+                <span className="block text-3xl sm:text-4xl lg:text-[38px] font-black font-sans tracking-tighter text-neutral-900 leading-none hover:text-neutral-700 transition-colors">
                   DADMDESIGN
                 </span>
               </div>
             </button>
           </div>
 
-          {/* Desktop Navigation (Centered) */}
-          <nav className="hidden md:flex items-center justify-center absolute left-1/2 -translate-x-1/2 space-x-2 md:space-x-3.5 lg:space-x-6 xl:space-x-9 whitespace-nowrap">
+          {/* Desktop Navigation (Evenly distributed to far right, 1.2x enlarged text, expanded letter spacing) */}
+          <nav className="hidden md:flex flex-1 items-center justify-between ml-8 md:ml-10 lg:ml-16 xl:ml-20 whitespace-nowrap">
             {/* 1. 회사소개 */}
             <div className="relative group">
               <button
                 id="nav-about"
                 onClick={() => handleNav('about', undefined, 'philosophy')}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-2 py-2 font-sans font-extrabold md:text-[18px] lg:text-[21px] xl:text-[24px] tracking-[0.03em] whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'about'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -100,22 +100,22 @@ export default function Header({
               </button>
               
               {/* Dropdown Menu for About */}
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div className="absolute left-0 lg:left-1/2 lg:-translate-x-1/2 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <button
                   onClick={() => handleNav('about', undefined, 'philosophy')}
-                  className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
                   인사말
                 </button>
                 <button
                   onClick={() => handleNav('about', undefined, 'history')}
-                  className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
                   회사연혁
                 </button>
                 <button
                   onClick={() => handleNav('about', undefined, 'directions')}
-                  className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                  className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                 >
                   오시는 길
                 </button>
@@ -127,7 +127,7 @@ export default function Header({
               <button
                 id="nav-procurement"
                 onClick={() => handleNav('procurement')}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-2 py-2 font-sans font-extrabold md:text-[18px] lg:text-[21px] xl:text-[24px] tracking-[0.03em] whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'procurement'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -137,12 +137,12 @@ export default function Header({
               </button>
               
               {/* Dropdown Menu */}
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 {categories.filter((cat) => cat.id === 'all' || cat.isProcurement !== false).map((cat) => (
                   <button
                     key={`proc-${cat.id}`}
                     onClick={() => handleNav('procurement', cat.id)}
-                    className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                    className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                   >
                     {cat.name}
                   </button>
@@ -155,7 +155,7 @@ export default function Header({
               <button
                 id="nav-products"
                 onClick={() => handleNav('products')}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-2 py-2 font-sans font-extrabold md:text-[18px] lg:text-[21px] xl:text-[24px] tracking-[0.03em] whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'products'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -165,12 +165,12 @@ export default function Header({
               </button>
               
               {/* Dropdown Menu */}
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 {categories.filter((cat) => cat.id === 'all' || cat.isGeneral !== false).map((cat) => (
                   <button
                     key={`prod-${cat.id}`}
                     onClick={() => handleNav('products', cat.id)}
-                    className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                    className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                   >
                     {cat.name}
                   </button>
@@ -182,7 +182,7 @@ export default function Header({
             <button
               id="nav-cases"
               onClick={() => handleNav('cases')}
-              className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+              className={`flex items-center px-2 py-2 font-sans font-extrabold md:text-[18px] lg:text-[21px] xl:text-[24px] tracking-[0.03em] whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                 activePage === 'cases'
                   ? 'text-neutral-900 border-b-2 border-neutral-900'
                   : 'text-neutral-600 hover:text-neutral-900'
@@ -196,7 +196,7 @@ export default function Header({
               <button
                 id="nav-inquiry"
                 onClick={() => handleNav('inquiry', undefined, undefined, defaultInquiryTab)}
-                className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+                className={`flex items-center px-2 py-2 font-sans font-extrabold md:text-[18px] lg:text-[21px] xl:text-[24px] tracking-[0.03em] whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                   activePage === 'inquiry'
                     ? 'text-neutral-900 border-b-2 border-neutral-900'
                     : 'text-neutral-600 hover:text-neutral-900'
@@ -207,11 +207,11 @@ export default function Header({
               
               {/* Dropdown Menu */}
               {(showPriceTab || showCatalogTab || showAsTab) && (
-                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="absolute right-0 lg:left-1/2 lg:-translate-x-1/2 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   {showPriceTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'price')}
-                      className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                      className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                     >
                       가격자료
                     </button>
@@ -219,7 +219,7 @@ export default function Header({
                   {showCatalogTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'catalog')}
-                      className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                      className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                     >
                       카탈로그 신청
                     </button>
@@ -227,7 +227,7 @@ export default function Header({
                   {showAsTab && (
                     <button
                       onClick={() => handleNav('inquiry', undefined, undefined, 'as')}
-                      className="block w-full text-left px-4 py-2 text-[13px] lg:text-[15.5px] font-sans font-bold tracking-wide text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
+                      className="block w-full text-left px-5 py-2.5 text-[15.5px] lg:text-[18px] font-sans font-bold tracking-[0.02em] text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
                     >
                       A/S 하자접수
                     </button>
@@ -236,11 +236,11 @@ export default function Header({
               )}
             </div>
 
-            {/* 6. 건설사업 */}
+            {/* 6. 건설사업 (제일 우측 끝 배치) */}
             <button
               id="nav-construction"
               onClick={() => handleNav('construction')}
-              className={`flex items-center px-1.5 py-2 font-sans font-extrabold md:text-[15.5px] lg:text-[17.5px] xl:text-[20px] tracking-tight whitespace-nowrap transition-colors duration-200 cursor-pointer ${
+              className={`flex items-center px-2 py-2 font-sans font-extrabold md:text-[18px] lg:text-[21px] xl:text-[24px] tracking-[0.03em] whitespace-nowrap transition-colors duration-200 cursor-pointer ${
                 activePage === 'construction'
                   ? 'text-neutral-900 border-b-2 border-neutral-900'
                   : 'text-neutral-600 hover:text-neutral-900'
