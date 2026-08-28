@@ -29,7 +29,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Product, Banner, CompanyInfo, Inquiry, Category, HomeSectionInfo, PopupItem, TypographySettings, ConstructionProject } from '../types';
-import { getDirectImageUrl, convertSynologyToDirectUrl } from '../utils/imageUtils';
+import { getDirectImageUrl, convertSynologyToDirectUrl, compressImageFile } from '../utils/imageUtils';
 import { ICON_MAP } from '../utils/iconMap';
 import { HomeSectionModal } from './AdminModals';
 import AdminTypographyTab from './AdminTypographyTab';
@@ -2136,16 +2136,13 @@ export default function AdminPanel({
                                   type="file"
                                   accept="image/*"
                                   className="hidden"
-                                  onChange={(e) => {
+                                  onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     if (!file) return;
-                                    const reader = new FileReader();
-                                    reader.onload = (event) => {
-                                      if (event.target?.result) {
-                                        setCustomPictoUrl(event.target.result as string);
-                                      }
-                                    };
-                                    reader.readAsDataURL(file);
+                                    const compressed = await compressImageFile(file, 400, 400, 0.9);
+                                    if (compressed) {
+                                      setCustomPictoUrl(compressed);
+                                    }
                                   }}
                                 />
                               </label>
@@ -2254,16 +2251,13 @@ export default function AdminPanel({
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   const file = e.target.files?.[0];
                                   if (!file) return;
-                                  const reader = new FileReader();
-                                  reader.onload = (event) => {
-                                    if (event.target?.result) {
-                                      handleBannerFieldChange(idx, 'imageUrl', event.target.result as string);
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
+                                  const compressed = await compressImageFile(file, 1920, 1080, 0.82);
+                                  if (compressed) {
+                                    handleBannerFieldChange(idx, 'imageUrl', compressed);
+                                  }
                                 }}
                               />
                             </label>
@@ -2544,16 +2538,13 @@ export default function AdminPanel({
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                if (event.target?.result) {
-                                  setCAboutUsImage(event.target.result as string);
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              const compressed = await compressImageFile(file, 1920, 1080, 0.82);
+                              if (compressed) {
+                                setCAboutUsImage(compressed);
+                              }
                             }}
                           />
                         </label>
@@ -2612,16 +2603,13 @@ export default function AdminPanel({
                               type="file"
                               accept="image/*"
                               className="hidden"
-                              onChange={(e) => {
+                              onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
-                                const reader = new FileReader();
-                                reader.onload = (event) => {
-                                  if (event.target?.result) {
-                                    setCNarajangterMarkUrl(event.target.result as string);
-                                  }
-                                };
-                                reader.readAsDataURL(file);
+                                const compressed = await compressImageFile(file, 400, 400, 0.9);
+                                if (compressed) {
+                                  setCNarajangterMarkUrl(compressed);
+                                }
                               }}
                             />
                           </label>
@@ -2690,16 +2678,13 @@ export default function AdminPanel({
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   const file = e.target.files?.[0];
                                   if (!file) return;
-                                  const reader = new FileReader();
-                                  reader.onload = (event) => {
-                                    if (event.target?.result) {
-                                      setCNewProductMarkUrl(event.target.result as string);
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
+                                  const compressed = await compressImageFile(file, 400, 400, 0.9);
+                                  if (compressed) {
+                                    setCNewProductMarkUrl(compressed);
+                                  }
                                 }}
                               />
                             </label>
@@ -2937,16 +2922,13 @@ export default function AdminPanel({
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                if (event.target?.result) {
-                                  setHImageUrl(event.target.result as string);
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              const compressed = await compressImageFile(file, 1920, 1200, 0.82);
+                              if (compressed) {
+                                setHImageUrl(compressed);
+                              }
                             }}
                           />
                         </label>
@@ -3653,16 +3635,13 @@ export default function AdminPanel({
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   const file = e.target.files?.[0];
                                   if (!file) return;
-                                  const reader = new FileReader();
-                                  reader.onload = (event) => {
-                                    if (event.target?.result) {
-                                      setPopupImageUrl(event.target.result as string);
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
+                                  const compressed = await compressImageFile(file, 1200, 1200, 0.85);
+                                  if (compressed) {
+                                    setPopupImageUrl(compressed);
+                                  }
                                 }}
                               />
                             </label>
@@ -4050,6 +4029,21 @@ export default function AdminPanel({
                             placeholder="이미지 URL 또는 로컬 경로"
                             className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
                           />
+                          <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3 py-2 rounded-xl cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                            <Upload size={13} />
+                            <span>파일</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+                                if (compressed) setConstImage(compressed);
+                              }}
+                            />
+                          </label>
                           <button
                             type="button"
                             onClick={() => {
@@ -4089,6 +4083,21 @@ export default function AdminPanel({
                             placeholder="보조 이미지 URL 또는 로컬 경로"
                             className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
                           />
+                          <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3 py-2 rounded-xl cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                            <Upload size={13} />
+                            <span>파일</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+                                if (compressed) setConstImage2(compressed);
+                              }}
+                            />
+                          </label>
                           <button
                             type="button"
                             onClick={() => {
@@ -4378,6 +4387,21 @@ export default function AdminPanel({
                             placeholder="이미지 URL"
                             className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
                           />
+                          <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3 py-2 rounded-xl cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                            <Upload size={13} />
+                            <span>파일</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+                                if (compressed) setCaseImage(compressed);
+                              }}
+                            />
+                          </label>
                           <button
                             type="button"
                             onClick={() => {
@@ -4415,6 +4439,21 @@ export default function AdminPanel({
                             placeholder="보조 이미지 URL"
                             className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
                           />
+                          <label className="shrink-0 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold px-3 py-2 rounded-xl cursor-pointer transition-colors inline-flex items-center space-x-1 shadow-xs">
+                            <Upload size={13} />
+                            <span>파일</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+                                if (compressed) setCaseImage2(compressed);
+                              }}
+                            />
+                          </label>
                           <button
                             type="button"
                             onClick={() => {

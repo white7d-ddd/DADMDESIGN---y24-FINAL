@@ -91,6 +91,90 @@ export function getDirectImageUrl(url: string): string {
   return cleanUrl;
 }
 
+/**
+ * Compresses an image file in the browser using canvas to prevent high memory usage,
+ * localStorage quota exhaustion, and server payload timeouts / 502 Bad Gateway errors.
+ */
+export function compressImageFile(
+  file: File,
+  maxWidth = 1600,
+  maxHeight = 1200,
+  quality = 0.82
+): Promise<string> {
+  return new Promise((resolve) => {
+    if (!file) {
+      resolve('');
+      return;
+    }
+
+    // Pass SVG straight through
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (!dataUrl) {
+        resolve('');
+        return;
+      }
+
+      const img = new window.Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, width);
+        canvas.height = Math.max(1, height);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(dataUrl);
+          return;
+        }
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // If it's a small PNG with possible transparency, keep png, otherwise compress to JPEG for optimal payload size
+        const isPng = file.type === 'image/png';
+        const mime = isPng && file.size < 500 * 1024 ? 'image/png' : 'image/jpeg';
+        try {
+          const compressed = canvas.toDataURL(mime, quality);
+          resolve(compressed);
+        } catch {
+          resolve(dataUrl);
+        }
+      };
+
+      img.onerror = () => {
+        resolve(dataUrl);
+      };
+
+      img.src = dataUrl;
+    };
+
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(file);
+  });
+}
+
 
 
 

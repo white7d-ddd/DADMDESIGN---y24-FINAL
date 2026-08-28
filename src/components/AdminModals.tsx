@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Trash2, Edit2, Layers, Image, Building, ShieldCheck, AlertTriangle, ArrowUp, ArrowDown, MapPin, Calendar, Upload } from 'lucide-react';
 import { Product, Category, Banner, CompanyInfo, ConstructionProject, HomeSectionInfo } from '../types';
-import { getDirectImageUrl, convertSynologyToDirectUrl } from '../utils/imageUtils';
+import { getDirectImageUrl, convertSynologyToDirectUrl, compressImageFile } from '../utils/imageUtils';
 import { sortHistoryByYear } from '../utils/dateUtils';
 import { ICON_MAP, AVAILABLE_ICONS } from '../utils/iconMap';
 
@@ -312,16 +312,13 @@ export function ProductModal({ isOpen, onClose, product, categories, onSave }: P
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
-                          const reader = new FileReader();
-                          reader.onload = (event) => {
-                            if (event.target?.result) {
-                              handleImageUrlChange(idx, event.target.result as string);
-                            }
-                          };
-                          reader.readAsDataURL(file);
+                          const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+                          if (compressed) {
+                            handleImageUrlChange(idx, compressed);
+                          }
                         }}
                       />
                     </label>
@@ -1096,16 +1093,13 @@ export function BannerModal({ isOpen, onClose, banners, onUpdateBanners }: Banne
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                if (event.target?.result) {
-                                  handleFieldChange(idx, 'imageUrl', event.target.result as string);
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              const compressed = await compressImageFile(file, 1920, 1080, 0.82);
+                              if (compressed) {
+                                handleFieldChange(idx, 'imageUrl', compressed);
+                              }
                             }}
                           />
                         </label>
@@ -1552,16 +1546,13 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                if (event.target?.result) {
-                                  setCAboutUsImage(event.target.result as string);
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              const compressed = await compressImageFile(file, 1920, 1080, 0.82);
+                              if (compressed) {
+                                setCAboutUsImage(compressed);
+                              }
                             }}
                           />
                         </label>
@@ -1613,16 +1604,13 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                if (event.target?.result) {
-                                  setCNarajangterMarkUrl(event.target.result as string);
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              const compressed = await compressImageFile(file, 400, 400, 0.9);
+                              if (compressed) {
+                                setCNarajangterMarkUrl(compressed);
+                              }
                             }}
                           />
                         </label>
@@ -1689,16 +1677,13 @@ export function CompanyInfoModal({ isOpen, onClose, companyInfo, onSave }: Compa
                             type="file"
                             accept="image/*"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (!file) return;
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                if (event.target?.result) {
-                                  setCNewProductMarkUrl(event.target.result as string);
-                                }
-                              };
-                              reader.readAsDataURL(file);
+                              const compressed = await compressImageFile(file, 400, 400, 0.9);
+                              if (compressed) {
+                                setCNewProductMarkUrl(compressed);
+                              }
                             }}
                           />
                         </label>
@@ -2171,16 +2156,13 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave, isC
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          if (event.target?.result) {
-                            setImage(event.target.result as string);
-                          }
-                        };
-                        reader.readAsDataURL(file);
+                        const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+                        if (compressed) {
+                          setImage(compressed);
+                        }
                       }}
                     />
                   </label>
@@ -2225,16 +2207,13 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave, isC
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          if (event.target?.result) {
-                            setImage2(event.target.result as string);
-                          }
-                        };
-                        reader.readAsDataURL(file);
+                        const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+                        if (compressed) {
+                          setImage2(compressed);
+                        }
                       }}
                     />
                   </label>
@@ -2608,16 +2587,13 @@ export function HomeSectionModal({ isOpen, onClose, homeSectionInfo, onSave }: H
                           type="file"
                           accept="image/*"
                           className="hidden"
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
-                            const reader = new FileReader();
-                            reader.onload = (event) => {
-                              if (event.target?.result) {
-                                setImageUrl(event.target.result as string);
-                              }
-                            };
-                            reader.readAsDataURL(file);
+                            const compressed = await compressImageFile(file, 1920, 1200, 0.82);
+                            if (compressed) {
+                              setImageUrl(compressed);
+                            }
                           }}
                         />
                       </label>

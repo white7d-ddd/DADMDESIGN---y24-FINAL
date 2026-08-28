@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { Product, Inquiry, PriceData, CompanyInfo, PageHeaders } from '../types';
 import { defaultPriceData } from '../data/defaultData';
-import { getDirectImageUrl } from '../utils/imageUtils';
+import { getDirectImageUrl, compressImageFile } from '../utils/imageUtils';
 import { motion, AnimatePresence } from 'motion/react';
 import EditableHeader from './EditableHeader';
 
@@ -285,14 +285,13 @@ ${asContent}
   };
 
   // Handle Photo Attachment Simulation
-  const handlePhotoUploadSimulation = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUploadSimulation = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAsAttachedPhoto(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImageFile(file, 1600, 1200, 0.82);
+      if (compressed) {
+        setAsAttachedPhoto(compressed);
+      }
     }
   };
 
