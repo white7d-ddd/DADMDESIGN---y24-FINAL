@@ -2111,6 +2111,20 @@ export function ConstructionProjectModal({ isOpen, onClose, project, onSave, isC
                   />
                 </div>
               </div>
+
+              {/* Description field (especially for Construction projects description text) */}
+              <div className="pt-1">
+                <label className="block text-xs font-bold text-neutral-600 mb-1">
+                  상세 설명 문구 (소개 본문)
+                </label>
+                <textarea
+                  rows={3}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="사업 개요나 조경 시공 특징, 특화 공법 등의 상세 설명 문구를 입력하세요."
+                  className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 bg-white rounded-xl focus:outline-none focus:border-neutral-950 leading-relaxed font-sans"
+                />
+              </div>
             </div>
 
             {/* 2 Photos Section */}

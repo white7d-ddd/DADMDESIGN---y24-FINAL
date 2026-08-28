@@ -1,6 +1,16 @@
 import express from "express";
+import http from "http";
 import path from "path";
 import fs from "fs";
+
+// Crash prevention: Catch uncaught exceptions and unhandled rejections to prevent 502 Bad Gateway
+process.on("uncaughtException", (err) => {
+  console.error("[Fatal Error: Uncaught Exception]", err?.message || err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("[Fatal Error: Unhandled Rejection]", reason);
+});
 
 // Cache resolved image buffers in memory (10 minutes TTL)
 const imageCache = new Map<string, { contentType: string; buffer: Buffer; expiresAt: number }>();
@@ -19,9 +29,13 @@ async function resolveSynologyImage(url: string): Promise<{ contentType: string;
       const serverID = parts[0];
       sharingId = parts[1];
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
       const servRes = await fetch("https://global.quickconnect.to/Serv.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        signal: controller.signal,
         body: JSON.stringify([
           {
             version: 1,
@@ -34,7 +48,7 @@ async function resolveSynologyImage(url: string): Promise<{ contentType: string;
             path: "/" + serverID + "/" + sharingId,
           },
         ]),
-      }).then((r) => r.json());
+      }).then((r) => r.json()).finally(() => clearTimeout(timeoutId));
 
       if (!servRes || !servRes[0] || servRes[0].errno !== 0) return null;
 
@@ -59,9 +73,14 @@ async function resolveSynologyImage(url: string): Promise<{ contentType: string;
       nasBaseUrl +
       "webapi/entry.cgi?api=SYNO.Core.Sharing.Login&version=1&method=login&sharing_id=" +
       encodeURIComponent(JSON.stringify(sharingId));
-    const loginData = await fetch(loginUrl).then((r) => r.json());
-    if (!loginData.success || !loginData.data?.sharing_sid) return null;
+    
+    const loginController = new AbortController();
+    const loginTimeout = setTimeout(() => loginController.abort(), 5000);
+    const loginData = await fetch(loginUrl, { signal: loginController.signal })
+      .then((r) => r.json())
+      .finally(() => clearTimeout(loginTimeout));
 
+    if (!loginData.success || !loginData.data?.sharing_sid) return null;
     const sid = loginData.data.sharing_sid;
 
     // 2. Get Session to find filename
@@ -69,7 +88,12 @@ async function resolveSynologyImage(url: string): Promise<{ contentType: string;
       nasBaseUrl +
       "webapi/entry.cgi?api=SYNO.Core.Sharing.Session&version=1&method=get&sharing_id=" +
       encodeURIComponent(JSON.stringify(sharingId));
-    const sessionText = await fetch(sessionUrl).then((r) => r.text());
+    
+    const sessController = new AbortController();
+    const sessTimeout = setTimeout(() => sessController.abort(), 5000);
+    const sessionText = await fetch(sessionUrl, { signal: sessController.signal })
+      .then((r) => r.text())
+      .finally(() => clearTimeout(sessTimeout));
 
     let filename = "";
     const fnMatch = sessionText.match(/\"filename\"\s*:\s*\"([^\"]+)\"/);
@@ -80,12 +104,16 @@ async function resolveSynologyImage(url: string): Promise<{ contentType: string;
       nasBaseUrl +
       "webapi/entry.cgi?api=SYNO.FolderSharing.Thumb&version=2&method=get&size=large&path=" +
       encodeURIComponent(JSON.stringify("/" + filename));
+    
+    const thumbController = new AbortController();
+    const thumbTimeout = setTimeout(() => thumbController.abort(), 8000);
     const imgRes = await fetch(thumbUrl, {
+      signal: thumbController.signal,
       headers: {
         Cookie: "sharing_sid=" + sid,
         "X-SYNO-SHARING": sharingId,
       },
-    });
+    }).finally(() => clearTimeout(thumbTimeout));
 
     if (imgRes.ok && imgRes.headers.get("content-type")?.startsWith("image/")) {
       const buffer = await imgRes.arrayBuffer();
@@ -95,110 +123,202 @@ async function resolveSynologyImage(url: string): Promise<{ contentType: string;
       };
     }
   } catch (e: any) {
-    console.error("Synology proxy resolution error:", e?.message || e);
+    console.error("[Synology Proxy Resolution Warning]:", e?.message || e);
   }
   return null;
 }
 
-async function startServer() {
-  const app = express();
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+// In-Memory Database Store for Instant, Non-Blocking, 100% Reliable Reads & Writes
+let inMemoryDB: Record<string, any> = {};
+const DATA_DIR = path.join(process.cwd(), "data");
+const DB_FILE = path.join(DATA_DIR, "db.json");
+const DB_TEMP_FILE = path.join(DATA_DIR, "db.json.tmp");
 
-  const rawPort = process.env.PORT || process.env.APP_PORT || "3000";
+// Initialize Database from Disk
+function initDatabase() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (fs.existsSync(DB_FILE)) {
+      const raw = fs.readFileSync(DB_FILE, "utf-8");
+      if (raw && raw.trim()) {
+        inMemoryDB = JSON.parse(raw);
+        console.log("[DB] Loaded existing data from db.json");
+      }
+    } else {
+      fs.writeFileSync(DB_FILE, "{}", "utf-8");
+    }
+  } catch (err: any) {
+    console.warn("[DB Warning] Initial load from disk fallback to in-memory:", err?.message || err);
+    inMemoryDB = {};
+  }
+}
+
+// Thread-safe Async Disk Flusher
+let isWriting = false;
+let pendingWrite = false;
+
+function scheduleDiskSave() {
+  if (isWriting) {
+    pendingWrite = true;
+    return;
+  }
+
+  isWriting = true;
+  pendingWrite = false;
+
+  setImmediate(() => {
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      const dataStr = JSON.stringify(inMemoryDB, null, 2);
+      // Atomic write using temp file and rename to prevent file corruption
+      fs.writeFileSync(DB_TEMP_FILE, dataStr, "utf-8");
+      fs.renameSync(DB_TEMP_FILE, DB_FILE);
+    } catch (err: any) {
+      console.warn("[DB Save Warning] Could not persist to disk file (in-memory remains active):", err?.message || err);
+    } finally {
+      isWriting = false;
+      if (pendingWrite) {
+        scheduleDiskSave();
+      }
+    }
+  });
+}
+
+async function startServer() {
+  initDatabase();
+
+  const app = express();
+
+  // Trust proxy for reverse proxies (Cafe24 AI Space, Nginx, Cloudflare, Traefik)
+  app.set("trust proxy", 1);
+
+  // Generous payload limits for admin image uploads and content editing
+  app.use(express.json({ limit: "100mb" }));
+  app.use(express.urlencoded({ limit: "100mb", extended: true }));
+
+  // CORS and Cache safety middleware
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
+  const rawPort = process.env.PORT || process.env.APP_PORT || process.env.NODE_PORT || "3000";
   const PORT = parseInt(rawPort, 10);
 
   const distPath = path.join(process.cwd(), "dist");
   const hasDist = fs.existsSync(path.join(distPath, "index.html"));
   const isProduction = process.env.NODE_ENV === "production" || (process.env.NODE_ENV !== "development" && hasDist);
 
-  const DB_FILE = path.join(process.cwd(), "data", "db.json");
+  // Health check routes for Cafe24 AI Space / Docker / Kubernetes probes
+  app.get(["/api/health", "/health", "/ping"], (req, res) => {
+    res.status(200).json({
+      status: "ok",
+      mode: isProduction ? "production" : "development",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  });
 
-  // Server-side JSON Database Persistence API Routes
+  // Fast & Crash-proof Server Database Persistence API
   app.get("/api/db", (req, res) => {
     try {
-      if (fs.existsSync(DB_FILE)) {
-        const fileContent = fs.readFileSync(DB_FILE, "utf-8");
-        const parsed = JSON.parse(fileContent);
-        return res.json(parsed);
-      }
-      return res.json({});
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+      return res.status(200).json(inMemoryDB || {});
     } catch (error: any) {
-      console.error("Error reading db.json:", error?.message || error);
-      return res.status(500).json({ error: "Failed to read database file" });
+      console.error("[API Error] Reading db:", error?.message || error);
+      return res.status(200).json(inMemoryDB || {});
     }
   });
 
   app.post("/api/db", (req, res) => {
     try {
       const incomingData = req.body;
-      let existingData = {};
-      if (fs.existsSync(DB_FILE)) {
-        try {
-          existingData = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
-        } catch {
-          existingData = {};
-        }
-      } else {
-        const dir = path.dirname(DB_FILE);
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
-        }
+      if (!incomingData || typeof incomingData !== "object") {
+        return res.status(400).json({ error: "Invalid JSON body" });
       }
 
-      const updatedData = { ...existingData, ...incomingData, updatedAt: new Date().toISOString() };
-      fs.writeFileSync(DB_FILE, JSON.stringify(updatedData, null, 2), "utf-8");
-      return res.json({ success: true, message: "Data saved successfully" });
+      // Update in-memory DB immediately for zero-delay response
+      inMemoryDB = {
+        ...inMemoryDB,
+        ...incomingData,
+        updatedAt: new Date().toISOString()
+      };
+
+      // Asynchronously flush to disk safely
+      scheduleDiskSave();
+
+      return res.status(200).json({
+        success: true,
+        message: "Data saved successfully to database",
+        updatedAt: inMemoryDB.updatedAt
+      });
     } catch (error: any) {
-      console.error("Error writing db.json:", error?.message || error);
-      return res.status(500).json({ error: "Failed to write database file" });
+      console.error("[API Error] Writing db:", error?.message || error);
+      return res.status(500).json({ error: "Failed to write database", message: error?.message });
     }
   });
 
-  // Synology NAS Share Link Proxy API Route
+  // Synology NAS Share Link Proxy API Route with Timeout Safeguards
   app.get("/api/synology-proxy", async (req, res) => {
     const targetUrl = req.query.url as string;
     if (!targetUrl) {
       return res.status(400).send("Missing url parameter");
     }
 
-    // 1. Check in-memory cache
-    const cached = imageCache.get(targetUrl);
-    if (cached && cached.expiresAt > Date.now()) {
-      res.setHeader("Content-Type", cached.contentType);
-      res.setHeader("Cache-Control", "public, max-age=86400");
-      return res.send(cached.buffer);
-    }
-
-    // 2. Resolve via Synology API
-    const resolved = await resolveSynologyImage(targetUrl);
-    if (resolved) {
-      imageCache.set(targetUrl, {
-        contentType: resolved.contentType,
-        buffer: resolved.buffer,
-        expiresAt: Date.now() + 10 * 60 * 1000,
-      });
-
-      res.setHeader("Content-Type", resolved.contentType);
-      res.setHeader("Cache-Control", "public, max-age=86400");
-      return res.send(resolved.buffer);
-    }
-
-    // 3. Fallback: try direct fetch
     try {
-      const directRes = await fetch(targetUrl);
-      if (directRes.ok && directRes.headers.get("content-type")?.startsWith("image/")) {
-        const arrayBuf = await directRes.arrayBuffer();
-        res.setHeader("Content-Type", directRes.headers.get("content-type") || "image/jpeg");
+      // 1. Check in-memory cache
+      const cached = imageCache.get(targetUrl);
+      if (cached && cached.expiresAt > Date.now()) {
+        res.setHeader("Content-Type", cached.contentType);
         res.setHeader("Cache-Control", "public, max-age=86400");
-        return res.send(Buffer.from(arrayBuf));
+        return res.send(cached.buffer);
       }
-    } catch {
-      // Ignore
-    }
 
-    // 4. Redirect if resolution failed
-    return res.redirect(targetUrl);
+      // 2. Resolve via Synology API
+      const resolved = await resolveSynologyImage(targetUrl);
+      if (resolved) {
+        imageCache.set(targetUrl, {
+          contentType: resolved.contentType,
+          buffer: resolved.buffer,
+          expiresAt: Date.now() + 10 * 60 * 1000,
+        });
+
+        res.setHeader("Content-Type", resolved.contentType);
+        res.setHeader("Cache-Control", "public, max-age=86400");
+        return res.send(resolved.buffer);
+      }
+
+      // 3. Fallback: try direct fetch
+      try {
+        const directController = new AbortController();
+        const directTimeout = setTimeout(() => directController.abort(), 6000);
+        const directRes = await fetch(targetUrl, { signal: directController.signal }).finally(() => clearTimeout(directTimeout));
+        
+        if (directRes.ok && directRes.headers.get("content-type")?.startsWith("image/")) {
+          const arrayBuf = await directRes.arrayBuffer();
+          res.setHeader("Content-Type", directRes.headers.get("content-type") || "image/jpeg");
+          res.setHeader("Cache-Control", "public, max-age=86400");
+          return res.send(Buffer.from(arrayBuf));
+        }
+      } catch {
+        // Ignore fallback fetch error
+      }
+
+      // 4. Redirect if resolution failed
+      return res.redirect(targetUrl);
+    } catch (proxyErr: any) {
+      console.warn("[Proxy Warning]:", proxyErr?.message || proxyErr);
+      return res.redirect(targetUrl);
+    }
   });
 
   // Serve static files in production or mount Vite middleware in development
@@ -210,15 +330,58 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, {
+      maxAge: '1h',
+      etag: true
+    }));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server listening on http://0.0.0.0:${PORT} (mode: ${isProduction ? "production" : "development"})`);
+  // Global Express Error Handler to prevent any 502/server termination
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error("[Express Middleware Error]", err?.message || err);
+    if (res.headersSent) {
+      return next(err);
+    }
+    res.status(500).json({ error: "Internal Server Error", message: err?.message || "An unexpected error occurred" });
   });
+
+  // Create HTTP server explicitly to configure keepAliveTimeout for Nginx / Cafe24 AI Space
+  const server = http.createServer(app);
+
+  // CRITICAL FOR REVERSE PROXY / CAFE24 / NGINX:
+  // Node.js default keepAliveTimeout is 5s, while Nginx default is 60-75s.
+  // When Nginx reuses a socket closed by Node, it produces 502 Bad Gateway!
+  // Setting keepAliveTimeout > Nginx's upstream keepalive prevents this issue.
+  server.keepAliveTimeout = 65000;
+  server.headersTimeout = 66000;
+
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`[Server Ready] Listening on http://0.0.0.0:${PORT} (mode: ${isProduction ? "production" : "development"})`);
+  });
+
+  // Graceful shutdown handling
+  const shutdown = () => {
+    console.log("[Server] Gracefully shutting down...");
+    // Save any pending DB changes before exiting
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+      fs.writeFileSync(DB_FILE, JSON.stringify(inMemoryDB, null, 2), "utf-8");
+    } catch {
+      // Ignore
+    }
+    server.close(() => {
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 }
 
 startServer();
+

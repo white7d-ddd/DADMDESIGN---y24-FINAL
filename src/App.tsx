@@ -166,6 +166,11 @@ export default function App() {
     return AVAILABLE_ICONS;
   });
 
+  // Pending data batch for debounced, resilient server synchronization
+  const pendingServerDataRef = React.useRef<Record<string, any>>({});
+  const saveTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const isSavingRef = React.useRef(false);
+
   const safeSetLocalStorage = (key: string, data: any) => {
     try {
       localStorage.setItem(key, typeof data === 'string' ? data : JSON.stringify(data));
@@ -174,12 +179,61 @@ export default function App() {
     }
   };
 
+  const flushServerSave = async (retryCount = 0) => {
+    if (Object.keys(pendingServerDataRef.current).length === 0) return;
+    if (isSavingRef.current && retryCount === 0) return;
+
+    const payload = { ...pendingServerDataRef.current };
+    isSavingRef.current = true;
+
+    try {
+      const response = await fetch('/api/db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server returned status ${response.status}`);
+      }
+
+      // Clear the saved keys from the pending ref
+      for (const key of Object.keys(payload)) {
+        if (pendingServerDataRef.current[key] === payload[key]) {
+          delete pendingServerDataRef.current[key];
+        }
+      }
+    } catch (err) {
+      console.warn(`[Server Sync] Save attempt ${retryCount + 1} failed:`, err);
+      // Auto retry up to 3 times with backoff if server temporarily unavailable (e.g. 502)
+      if (retryCount < 3) {
+        setTimeout(() => {
+          flushServerSave(retryCount + 1);
+        }, 1500 * (retryCount + 1));
+      }
+    } finally {
+      isSavingRef.current = false;
+      // If new changes arrived while saving, schedule another flush
+      if (Object.keys(pendingServerDataRef.current).length > 0 && retryCount === 0) {
+        if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = setTimeout(() => flushServerSave(0), 300);
+      }
+    }
+  };
+
   const saveServerDB = (partialData: Record<string, any>) => {
-    fetch('/api/db', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(partialData)
-    }).catch(err => console.warn('Failed to save to server db:', err));
+    pendingServerDataRef.current = {
+      ...pendingServerDataRef.current,
+      ...partialData
+    };
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      flushServerSave(0);
+    }, 250);
   };
 
   const handleUpdateAvailableIcons = (updatedIcons: { name: string; label: string }[]) => {
@@ -1488,6 +1542,10 @@ export default function App() {
                 onUpdatePopups={handleUpdatePopups}
                 typographySettings={typographySettings}
                 onUpdateTypographySettings={handleUpdateTypographySettings}
+                constructionProjects={constructionProjects}
+                onUpdateConstructionProjects={handleUpdateConstructionProjects}
+                installationCases={installationCases}
+                onUpdateInstallationCases={handleUpdateInstallationCases}
               />
             </motion.div>
           )}

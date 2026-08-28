@@ -21,9 +21,14 @@ import {
   UserCog,
   MessageSquare,
   Upload,
-  Type
+  Type,
+  Briefcase,
+  Camera,
+  Calendar,
+  MapPin,
+  Sparkles
 } from 'lucide-react';
-import { Product, Banner, CompanyInfo, Inquiry, Category, HomeSectionInfo, PopupItem, TypographySettings } from '../types';
+import { Product, Banner, CompanyInfo, Inquiry, Category, HomeSectionInfo, PopupItem, TypographySettings, ConstructionProject } from '../types';
 import { getDirectImageUrl, convertSynologyToDirectUrl } from '../utils/imageUtils';
 import { ICON_MAP } from '../utils/iconMap';
 import { HomeSectionModal } from './AdminModals';
@@ -51,9 +56,13 @@ interface AdminPanelProps {
   onUpdatePopups?: (popups: PopupItem[]) => void;
   typographySettings?: TypographySettings;
   onUpdateTypographySettings?: (settings: TypographySettings) => void;
+  constructionProjects?: ConstructionProject[];
+  onUpdateConstructionProjects?: (projects: ConstructionProject[]) => void;
+  installationCases?: ConstructionProject[];
+  onUpdateInstallationCases?: (cases: ConstructionProject[]) => void;
 }
 
-type AdminTab = 'products' | 'categories' | 'banners' | 'company' | 'home' | 'inquiries' | 'backup' | 'security' | 'popups' | 'typography';
+type AdminTab = 'products' | 'categories' | 'banners' | 'company' | 'home' | 'construction' | 'cases' | 'inquiries' | 'backup' | 'security' | 'popups' | 'typography';
 
 export default function AdminPanel({
   products,
@@ -76,7 +85,11 @@ export default function AdminPanel({
   popups = [],
   onUpdatePopups,
   typographySettings,
-  onUpdateTypographySettings
+  onUpdateTypographySettings,
+  constructionProjects = [],
+  onUpdateConstructionProjects,
+  installationCases = [],
+  onUpdateInstallationCases
 }: AdminPanelProps) {
   // Admin credentials state loaded from localStorage
   const [adminUsername, setAdminUsername] = useState(() => {
@@ -342,6 +355,196 @@ export default function AdminPanel({
       setBannerFields(banners);
     }
   }, [banners]);
+
+  // Construction Management State
+  const [isAddingConstruction, setIsAddingConstruction] = useState(false);
+  const [isEditingConstruction, setIsEditingConstruction] = useState<ConstructionProject | null>(null);
+  const [constTitle, setConstTitle] = useState('');
+  const [constLocation, setConstLocation] = useState('');
+  const [constPeriod, setConstPeriod] = useState('');
+  const [constItems, setConstItems] = useState('');
+  const [constDescription, setConstDescription] = useState('');
+  const [constTag, setConstTag] = useState('공동주택 조경');
+  const [constImage, setConstImage] = useState('/src/assets/images/street_bench_1783302667162.jpg');
+  const [constImage2, setConstImage2] = useState('');
+  const [constDeleteConfirmId, setConstDeleteConfirmId] = useState<string | null>(null);
+
+  // Cases Management State
+  const [isAddingCase, setIsAddingCase] = useState(false);
+  const [isEditingCase, setIsEditingCase] = useState<ConstructionProject | null>(null);
+  const [caseTitle, setCaseTitle] = useState('');
+  const [caseLocation, setCaseLocation] = useState('');
+  const [casePeriod, setCasePeriod] = useState('');
+  const [caseItems, setCaseItems] = useState('');
+  const [caseDescription, setCaseDescription] = useState('');
+  const [caseTag, setCaseTag] = useState('시설물 설치');
+  const [caseImage, setCaseImage] = useState('/src/assets/images/street_bench_1783302667162.jpg');
+  const [caseImage2, setCaseImage2] = useState('');
+  const [caseDeleteConfirmId, setCaseDeleteConfirmId] = useState<string | null>(null);
+
+  const openAddConstruction = () => {
+    setIsEditingConstruction(null);
+    setConstTitle('');
+    setConstLocation('');
+    setConstPeriod(`${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, '0')}`);
+    setConstItems('');
+    setConstDescription('');
+    setConstTag('공동주택 조경');
+    setConstImage('/src/assets/images/street_bench_1783302667162.jpg');
+    setConstImage2('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80');
+    setIsAddingConstruction(true);
+    setConstDeleteConfirmId(null);
+  };
+
+  const openEditConstruction = (proj: ConstructionProject) => {
+    setIsEditingConstruction(proj);
+    setConstTitle(proj.title);
+    setConstLocation(proj.location);
+    setConstPeriod(proj.period || '');
+    setConstItems(proj.items);
+    setConstDescription(proj.description || '');
+    setConstTag(proj.tag || '공동주택 조경');
+    setConstImage(proj.image || '/src/assets/images/street_bench_1783302667162.jpg');
+    setConstImage2(proj.image2 || proj.image || '');
+    setIsAddingConstruction(false);
+    setConstDeleteConfirmId(null);
+  };
+
+  const handleSaveConstruction = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!constTitle.trim() || !constLocation.trim() || !constItems.trim()) {
+      alert('사업/공사명, 현장 위치, 규격/내역은 필수 입력 항목입니다.');
+      return;
+    }
+    const currentList = constructionProjects || [];
+    if (isAddingConstruction) {
+      const newProj: ConstructionProject = {
+        id: `proj-${Date.now()}`,
+        title: constTitle.trim(),
+        location: constLocation.trim(),
+        period: constPeriod.trim() || `${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, '0')}`,
+        items: constItems.trim(),
+        description: constDescription.trim(),
+        tag: constTag.trim() || '공동주택 조경',
+        image: constImage.trim() || '/src/assets/images/street_bench_1783302667162.jpg',
+        image2: constImage2.trim() || constImage.trim()
+      };
+      if (onUpdateConstructionProjects) {
+        onUpdateConstructionProjects([newProj, ...currentList]);
+      }
+    } else if (isEditingConstruction) {
+      const updated = currentList.map(p => {
+        if (p.id === isEditingConstruction.id) {
+          return {
+            ...p,
+            title: constTitle.trim(),
+            location: constLocation.trim(),
+            period: constPeriod.trim(),
+            items: constItems.trim(),
+            description: constDescription.trim(),
+            tag: constTag.trim(),
+            image: constImage.trim(),
+            image2: constImage2.trim() || constImage.trim()
+          };
+        }
+        return p;
+      });
+      if (onUpdateConstructionProjects) {
+        onUpdateConstructionProjects(updated);
+      }
+    }
+    setIsAddingConstruction(false);
+    setIsEditingConstruction(null);
+  };
+
+  const handleDeleteConstruction = (id: string) => {
+    if (onUpdateConstructionProjects && constructionProjects) {
+      onUpdateConstructionProjects(constructionProjects.filter(p => p.id !== id));
+    }
+    setConstDeleteConfirmId(null);
+  };
+
+  const openAddCase = () => {
+    setIsEditingCase(null);
+    setCaseTitle('');
+    setCaseLocation('');
+    setCasePeriod(`${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, '0')}`);
+    setCaseItems('');
+    setCaseDescription('');
+    setCaseTag('시설물 설치');
+    setCaseImage('/src/assets/images/street_bench_1783302667162.jpg');
+    setCaseImage2('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80');
+    setIsAddingCase(true);
+    setCaseDeleteConfirmId(null);
+  };
+
+  const openEditCase = (caseItem: ConstructionProject) => {
+    setIsEditingCase(caseItem);
+    setCaseTitle(caseItem.title);
+    setCaseLocation(caseItem.location);
+    setCasePeriod(caseItem.period || '');
+    setCaseItems(caseItem.items);
+    setCaseDescription(caseItem.description || '');
+    setCaseTag(caseItem.tag || '시설물 설치');
+    setCaseImage(caseItem.image || '/src/assets/images/street_bench_1783302667162.jpg');
+    setCaseImage2(caseItem.image2 || caseItem.image || '');
+    setIsAddingCase(false);
+    setCaseDeleteConfirmId(null);
+  };
+
+  const handleSaveCase = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!caseTitle.trim() || !caseLocation.trim() || !caseItems.trim()) {
+      alert('제품명, 설치 현장명, 규격은 필수 입력 항목입니다.');
+      return;
+    }
+    const currentList = installationCases || [];
+    if (isAddingCase) {
+      const newCase: ConstructionProject = {
+        id: `case-${Date.now()}`,
+        title: caseTitle.trim(),
+        location: caseLocation.trim(),
+        period: casePeriod.trim() || `${new Date().getFullYear()}.${String(new Date().getMonth() + 1).padStart(2, '0')}`,
+        items: caseItems.trim(),
+        description: caseDescription.trim(),
+        tag: caseTag.trim() || '시설물 설치',
+        image: caseImage.trim() || '/src/assets/images/street_bench_1783302667162.jpg',
+        image2: caseImage2.trim() || caseImage.trim()
+      };
+      if (onUpdateInstallationCases) {
+        onUpdateInstallationCases([newCase, ...currentList]);
+      }
+    } else if (isEditingCase) {
+      const updated = currentList.map(c => {
+        if (c.id === isEditingCase.id) {
+          return {
+            ...c,
+            title: caseTitle.trim(),
+            location: caseLocation.trim(),
+            period: casePeriod.trim(),
+            items: caseItems.trim(),
+            description: caseDescription.trim(),
+            tag: caseTag.trim(),
+            image: caseImage.trim(),
+            image2: caseImage2.trim() || caseImage.trim()
+          };
+        }
+        return c;
+      });
+      if (onUpdateInstallationCases) {
+        onUpdateInstallationCases(updated);
+      }
+    }
+    setIsAddingCase(false);
+    setIsEditingCase(null);
+  };
+
+  const handleDeleteCase = (id: string) => {
+    if (onUpdateInstallationCases && installationCases) {
+      onUpdateInstallationCases(installationCases.filter(c => c.id !== id));
+    }
+    setCaseDeleteConfirmId(null);
+  };
 
   // Handles Login with username and password
   const handleAuth = (e?: React.FormEvent) => {
@@ -758,7 +961,9 @@ export default function AdminPanel({
       banners,
       companyInfo,
       inquiries,
-      typographySettings
+      typographySettings,
+      constructionProjects,
+      installationCases
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
     const downloadAnchor = document.createElement('a');
@@ -788,6 +993,12 @@ export default function AdminPanel({
           if (parsed.inquiries) onUpdateInquiries(parsed.inquiries);
           if (parsed.typographySettings && onUpdateTypographySettings) {
             onUpdateTypographySettings(parsed.typographySettings);
+          }
+          if (parsed.constructionProjects && onUpdateConstructionProjects) {
+            onUpdateConstructionProjects(parsed.constructionProjects);
+          }
+          if (parsed.installationCases && onUpdateInstallationCases) {
+            onUpdateInstallationCases(parsed.installationCases);
           }
           alert('가상 데이터베이스 복원이 성공적으로 완료되었습니다! 웹사이트 내용이 즉시 갱신되었습니다.');
           window.location.reload();
@@ -988,6 +1199,32 @@ export default function AdminPanel({
               >
                 <Image size={15} />
                 <span>메인화면 본문 & 이미지 수정</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('construction'); setIsAddingConstruction(false); setIsEditingConstruction(null); }}
+                className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-left cursor-pointer ${
+                  activeTab === 'construction'
+                    ? 'bg-neutral-900 text-white font-bold shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                }`}
+                id="admin-tab-construction-btn"
+              >
+                <Briefcase size={15} className="text-amber-500" />
+                <span>건설사업 실적 관리 ({constructionProjects.length})</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('cases'); setIsAddingCase(false); setIsEditingCase(null); }}
+                className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-left cursor-pointer ${
+                  activeTab === 'cases'
+                    ? 'bg-neutral-900 text-white font-bold shadow-sm'
+                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
+                }`}
+                id="admin-tab-cases-btn"
+              >
+                <Camera size={15} className="text-amber-500" />
+                <span>시공사례 관리 ({installationCases.length})</span>
               </button>
 
               <button
@@ -3542,6 +3779,682 @@ export default function AdminPanel({
                         className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-xs rounded-xl cursor-pointer transition-all shadow-sm"
                       >
                         {isAddingPopup ? '팝업 등록 완료' : '정보 수정 저장'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* TAB: CONSTRUCTION PROJECTS CONTROL */}
+            {activeTab === 'construction' && (
+              <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-sm space-y-6">
+                {!isAddingConstruction && !isEditingConstruction ? (
+                  <>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-neutral-100 gap-4">
+                      <div>
+                        <h2 className="text-base font-bold text-neutral-900 font-sans flex items-center space-x-2">
+                          <Briefcase size={18} className="text-amber-500" />
+                          <span>건설사업 실적 관리 ({constructionProjects.length})</span>
+                        </h2>
+                        <p className="text-xs text-neutral-500 font-sans mt-0.5">
+                          건설사업 실적 목록의 모든 사업명, 현장 위치, 상세 설명 문구 및 현장 사진을 자유롭게 수정·추가·삭제합니다.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={openAddConstruction}
+                        className="inline-flex items-center space-x-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer whitespace-nowrap"
+                        id="admin-add-construction-btn"
+                      >
+                        <Plus size={14} />
+                        <span>새 건설실적 등록</span>
+                      </button>
+                    </div>
+
+                    {constructionProjects.length === 0 ? (
+                      <div className="text-center py-16 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
+                        <Briefcase size={36} className="mx-auto text-neutral-300 mb-3" />
+                        <p className="text-sm font-semibold text-neutral-600">등록된 건설사업 실적이 없습니다.</p>
+                        <p className="text-xs text-neutral-400 mt-1">상단의 '새 건설실적 등록' 버튼을 눌러 첫 실적을 추가하세요.</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {constructionProjects.map((proj) => (
+                          <div
+                            key={proj.id}
+                            className="border border-neutral-200/90 rounded-2xl p-4 bg-white hover:border-neutral-400 transition-all flex flex-col justify-between space-y-4 shadow-sm"
+                          >
+                            <div className="space-y-3">
+                              {/* Top row with Image Thumbnail & Badges */}
+                              <div className="flex gap-3 items-start">
+                                <div className="w-24 h-20 rounded-xl overflow-hidden bg-neutral-100 flex-shrink-0 border border-neutral-200">
+                                  <img
+                                    src={getDirectImageUrl(proj.image)}
+                                    alt={proj.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/const/300/200';
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-900 text-white">
+                                      {proj.tag || '공동주택 조경'}
+                                    </span>
+                                    <span className="text-[11px] font-mono text-neutral-500">
+                                      {proj.period}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-sm font-bold text-neutral-900 line-clamp-2 leading-tight">
+                                    {proj.title}
+                                  </h3>
+                                  <p className="text-xs text-neutral-500 mt-1 flex items-center gap-1 line-clamp-1">
+                                    <MapPin size={11} className="flex-shrink-0 text-neutral-400" />
+                                    <span>{proj.location}</span>
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Specs/Items */}
+                              <div className="text-[11px] text-neutral-600 bg-neutral-50 p-2.5 rounded-xl border border-neutral-150">
+                                <span className="font-semibold text-neutral-800">공사 내역: </span>
+                                {proj.items}
+                              </div>
+
+                              {/* Description Box (Editable Content) */}
+                              <div className="text-xs text-neutral-700 bg-amber-50/50 p-3 rounded-xl border border-amber-200/60 space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] font-bold tracking-wider uppercase text-amber-900">
+                                    상세 설명 내용
+                                  </span>
+                                  <button
+                                    onClick={() => openEditConstruction(proj)}
+                                    className="text-[10px] text-amber-800 hover:underline font-semibold cursor-pointer"
+                                  >
+                                    수정하기
+                                  </button>
+                                </div>
+                                <p className="text-neutral-700 leading-relaxed whitespace-pre-line text-xs">
+                                  {proj.description || <span className="text-neutral-400 italic">설명 문구가 작성되지 않았습니다. 수정 버튼을 눌러 작성하세요.</span>}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                              <span className="text-[10px] font-mono text-neutral-400">ID: {proj.id}</span>
+                              <div className="flex items-center space-x-2">
+                                {constDeleteConfirmId === proj.id ? (
+                                  <div className="flex items-center space-x-1.5">
+                                    <span className="text-[11px] font-bold text-red-600">삭제할까요?</span>
+                                    <button
+                                      onClick={() => handleDeleteConstruction(proj.id)}
+                                      className="px-2.5 py-1 text-xs bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg cursor-pointer"
+                                    >
+                                      삭제
+                                    </button>
+                                    <button
+                                      onClick={() => setConstDeleteConfirmId(null)}
+                                      className="px-2 py-1 text-xs border border-neutral-200 text-neutral-600 rounded-lg cursor-pointer hover:bg-neutral-50"
+                                    >
+                                      취소
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => openEditConstruction(proj)}
+                                      className="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-semibold border border-neutral-200 hover:border-neutral-400 bg-white text-neutral-700 rounded-lg cursor-pointer transition-all"
+                                    >
+                                      <Edit2 size={12} />
+                                      <span>수정</span>
+                                    </button>
+                                    <button
+                                      onClick={() => setConstDeleteConfirmId(proj.id)}
+                                      className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                      title="삭제"
+                                    >
+                                      <Trash2 size={13} />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  /* Add / Edit Form */
+                  <form onSubmit={handleSaveConstruction} className="space-y-6">
+                    <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
+                      <div>
+                        <h2 className="text-base font-bold text-neutral-900 font-sans">
+                          {isAddingConstruction ? '신규 건설공사 실적 등록' : '건설공사 실적 및 상세 내용 수정'}
+                        </h2>
+                        <p className="text-[11px] text-neutral-400 font-sans mt-0.5">
+                          건설사업 실적 카드에 표시될 사업명, 위치, 기간, 공사 내역 및 상세 설명 문구를 입력합니다.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setIsAddingConstruction(false); setIsEditingConstruction(null); }}
+                        className="p-2 text-neutral-400 hover:text-neutral-700 rounded-lg cursor-pointer"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          사업 / 공사명 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={constTitle}
+                          onChange={(e) => setConstTitle(e.target.value)}
+                          placeholder="예: 용인 역북 푸르지오 신축 아파트 특화 경관 조경시설물 조성공사"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          현장 위치 (주소/지역) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={constLocation}
+                          onChange={(e) => setConstLocation(e.target.value)}
+                          placeholder="예: 경기도 용인시 처인구 역북동"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          시공 / 공사 기간
+                        </label>
+                        <input
+                          type="text"
+                          value={constPeriod}
+                          onChange={(e) => setConstPeriod(e.target.value)}
+                          placeholder="예: 2026.04 - 2026.05 또는 2026.04"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          분류 태그
+                        </label>
+                        <input
+                          type="text"
+                          value={constTag}
+                          onChange={(e) => setConstTag(e.target.value)}
+                          placeholder="예: 공동주택 조경, 도시공원 조성, 공공시설 조경"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          주요 시공 시설물 및 규격 내역 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={constItems}
+                          onChange={(e) => setConstItems(e.target.value)}
+                          placeholder="예: 스마트 쉘터 2개소, 디자인 벤치 15조, 복합 휴게 파고라 1동 외"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                          required
+                        />
+                      </div>
+
+                      {/* DETAILED DESCRIPTION (HIGHLIGHTED TEXTAREA) */}
+                      <div className="md:col-span-2 bg-neutral-50 p-4 rounded-2xl border border-neutral-200/80 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-neutral-900">
+                            상세 설명 문구 (선택 내용 수정)
+                          </label>
+                          <span className="text-[10px] text-neutral-500">
+                            줄바꿈 및 문단 구성이 그대로 실시간 반영됩니다.
+                          </span>
+                        </div>
+                        <textarea
+                          value={constDescription}
+                          onChange={(e) => setConstDescription(e.target.value)}
+                          rows={4}
+                          placeholder="건설사업 실적 상세 설명 문구를 자유롭게 입력하세요. (예: 입주민의 편안한 휴식과 현대적인 단지 경관을 극대화하기 위해 친환경 목재와 스틸 프레임을 융합한 맞춤형 조경시설물을 설계·시공하였습니다.)"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 bg-white leading-relaxed"
+                          id="admin-const-description-input"
+                        />
+                      </div>
+
+                      {/* PHOTO 1 */}
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold text-neutral-700">
+                          대표 현장 사진 (메인 이미지)
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={constImage}
+                            onChange={(e) => setConstImage(e.target.value)}
+                            placeholder="이미지 URL 또는 로컬 경로"
+                            className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const converted = convertSynologyToDirectUrl(constImage);
+                              if (converted !== constImage) setConstImage(converted);
+                            }}
+                            className="px-3 py-2 text-[11px] bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-xl whitespace-nowrap cursor-pointer"
+                            title="시놀로지 NAS 공유 링크 변환"
+                          >
+                            NAS변환
+                          </button>
+                        </div>
+                        {constImage && (
+                          <div className="w-full h-32 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 mt-2">
+                            <img
+                              src={getDirectImageUrl(constImage)}
+                              alt="미리보기"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/preview1/400/300';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* PHOTO 2 */}
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold text-neutral-700">
+                          세부 / 추가 현장 사진 (보조 이미지)
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={constImage2}
+                            onChange={(e) => setConstImage2(e.target.value)}
+                            placeholder="보조 이미지 URL 또는 로컬 경로"
+                            className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const converted = convertSynologyToDirectUrl(constImage2);
+                              if (converted !== constImage2) setConstImage2(converted);
+                            }}
+                            className="px-3 py-2 text-[11px] bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-xl whitespace-nowrap cursor-pointer"
+                            title="시놀로지 NAS 공유 링크 변환"
+                          >
+                            NAS변환
+                          </button>
+                        </div>
+                        {constImage2 && (
+                          <div className="w-full h-32 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 mt-2">
+                            <img
+                              src={getDirectImageUrl(constImage2)}
+                              alt="보조 미리보기"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/preview2/400/300';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end space-x-3 pt-4 border-t border-neutral-100">
+                      <button
+                        type="button"
+                        onClick={() => { setIsAddingConstruction(false); setIsEditingConstruction(null); }}
+                        className="px-5 py-2.5 border border-neutral-200 hover:border-neutral-400 text-neutral-700 font-sans font-bold text-xs rounded-xl cursor-pointer transition-all"
+                      >
+                        취소하기
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-xs rounded-xl cursor-pointer transition-all shadow-sm"
+                        id="admin-save-construction-btn"
+                      >
+                        {isAddingConstruction ? '건설실적 등록 완료' : '정보 수정 저장'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* TAB: INSTALLATION CASES CONTROL */}
+            {activeTab === 'cases' && (
+              <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-sm space-y-6">
+                {!isAddingCase && !isEditingCase ? (
+                  <>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-neutral-100 gap-4">
+                      <div>
+                        <h2 className="text-base font-bold text-neutral-900 font-sans flex items-center space-x-2">
+                          <Camera size={18} className="text-amber-500" />
+                          <span>시공사례 관리 ({installationCases.length})</span>
+                        </h2>
+                        <p className="text-xs text-neutral-500 font-sans mt-0.5">
+                          단품 및 특화 시설물의 시공사례 목록, 설명 문구 및 현장 사진을 수정·추가·삭제합니다.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={openAddCase}
+                        className="inline-flex items-center space-x-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer whitespace-nowrap"
+                        id="admin-add-case-btn"
+                      >
+                        <Plus size={14} />
+                        <span>새 시공사례 등록</span>
+                      </button>
+                    </div>
+
+                    {installationCases.length === 0 ? (
+                      <div className="text-center py-16 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
+                        <Camera size={36} className="mx-auto text-neutral-300 mb-3" />
+                        <p className="text-sm font-semibold text-neutral-600">등록된 시공사례가 없습니다.</p>
+                        <p className="text-xs text-neutral-400 mt-1">상단의 '새 시공사례 등록' 버튼을 눌러 첫 사례를 추가하세요.</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {installationCases.map((cItem) => (
+                          <div
+                            key={cItem.id}
+                            className="border border-neutral-200/90 rounded-2xl p-4 bg-white hover:border-neutral-400 transition-all flex flex-col justify-between space-y-4 shadow-sm"
+                          >
+                            <div className="space-y-3">
+                              <div className="flex gap-3 items-start">
+                                <div className="w-24 h-20 rounded-xl overflow-hidden bg-neutral-100 flex-shrink-0 border border-neutral-200">
+                                  <img
+                                    src={getDirectImageUrl(cItem.image)}
+                                    alt={cItem.title}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/case/300/200';
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-900 text-white">
+                                      {cItem.tag || '시설물 설치'}
+                                    </span>
+                                    <span className="text-[11px] font-mono text-neutral-500">
+                                      {cItem.period}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-sm font-bold text-neutral-900 line-clamp-2 leading-tight">
+                                    {cItem.title}
+                                  </h3>
+                                  <p className="text-xs text-neutral-500 mt-1 flex items-center gap-1 line-clamp-1">
+                                    <MapPin size={11} className="flex-shrink-0 text-neutral-400" />
+                                    <span>{cItem.location}</span>
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="text-[11px] text-neutral-600 bg-neutral-50 p-2.5 rounded-xl border border-neutral-150">
+                                <span className="font-semibold text-neutral-800">규격/설치: </span>
+                                {cItem.items}
+                              </div>
+
+                              {cItem.description && (
+                                <div className="text-xs text-neutral-700 bg-neutral-50 p-3 rounded-xl border border-neutral-200 leading-relaxed">
+                                  <span className="text-[10px] font-bold text-neutral-500 block mb-1">설명 문구:</span>
+                                  <p className="whitespace-pre-line">{cItem.description}</p>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                              <span className="text-[10px] font-mono text-neutral-400">ID: {cItem.id}</span>
+                              <div className="flex items-center space-x-2">
+                                {caseDeleteConfirmId === cItem.id ? (
+                                  <div className="flex items-center space-x-1.5">
+                                    <span className="text-[11px] font-bold text-red-600">삭제할까요?</span>
+                                    <button
+                                      onClick={() => handleDeleteCase(cItem.id)}
+                                      className="px-2.5 py-1 text-xs bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg cursor-pointer"
+                                    >
+                                      삭제
+                                    </button>
+                                    <button
+                                      onClick={() => setCaseDeleteConfirmId(null)}
+                                      className="px-2 py-1 text-xs border border-neutral-200 text-neutral-600 rounded-lg cursor-pointer hover:bg-neutral-50"
+                                    >
+                                      취소
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => openEditCase(cItem)}
+                                      className="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-semibold border border-neutral-200 hover:border-neutral-400 bg-white text-neutral-700 rounded-lg cursor-pointer transition-all"
+                                    >
+                                      <Edit2 size={12} />
+                                      <span>수정</span>
+                                    </button>
+                                    <button
+                                      onClick={() => setCaseDeleteConfirmId(cItem.id)}
+                                      className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                      title="삭제"
+                                    >
+                                      <Trash2 size={13} />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <form onSubmit={handleSaveCase} className="space-y-6">
+                    <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
+                      <div>
+                        <h2 className="text-base font-bold text-neutral-900 font-sans">
+                          {isAddingCase ? '신규 시공사례 등록' : '시공사례 정보 수정'}
+                        </h2>
+                        <p className="text-[11px] text-neutral-400 font-sans mt-0.5">
+                          시공사례 카드에 표시될 제품명, 설치 위치, 설치 규격 및 설명 문구를 입력합니다.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setIsAddingCase(false); setIsEditingCase(null); }}
+                        className="p-2 text-neutral-400 hover:text-neutral-700 rounded-lg cursor-pointer"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          제품명 / 시설물명 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={caseTitle}
+                          onChange={(e) => setCaseTitle(e.target.value)}
+                          placeholder="예: 스마트 온열 벤치 및 파고라 세트"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          설치 현장명 (위치) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={caseLocation}
+                          onChange={(e) => setCaseLocation(e.target.value)}
+                          placeholder="예: 서울숲 공공보행로"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          시공 년월
+                        </label>
+                        <input
+                          type="text"
+                          value={casePeriod}
+                          onChange={(e) => setCasePeriod(e.target.value)}
+                          placeholder="예: 2026.03"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          분류 태그
+                        </label>
+                        <input
+                          type="text"
+                          value={caseTag}
+                          onChange={(e) => setCaseTag(e.target.value)}
+                          placeholder="예: 벤치 시공, 파고라 설치, 스마트 쉼터"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+                          설치 규격 및 세부 모델 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={caseItems}
+                          onChange={(e) => setCaseItems(e.target.value)}
+                          placeholder="예: W2000 x D600 x H450 (mm) - 5조"
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950"
+                          required
+                        />
+                      </div>
+
+                      <div className="md:col-span-2 bg-neutral-50 p-4 rounded-2xl border border-neutral-200/80 space-y-2">
+                        <label className="block text-xs font-bold text-neutral-900">
+                          상세 설명 문구 (선택 내용 수정)
+                        </label>
+                        <textarea
+                          value={caseDescription}
+                          onChange={(e) => setCaseDescription(e.target.value)}
+                          rows={3}
+                          placeholder="시공사례에 대한 상세 설명을 입력하세요."
+                          className="w-full text-xs px-3.5 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 bg-white leading-relaxed"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold text-neutral-700">
+                          대표 시공 사진
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={caseImage}
+                            onChange={(e) => setCaseImage(e.target.value)}
+                            placeholder="이미지 URL"
+                            className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const converted = convertSynologyToDirectUrl(caseImage);
+                              if (converted !== caseImage) setCaseImage(converted);
+                            }}
+                            className="px-3 py-2 text-[11px] bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-xl whitespace-nowrap cursor-pointer"
+                          >
+                            NAS변환
+                          </button>
+                        </div>
+                        {caseImage && (
+                          <div className="w-full h-32 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 mt-2">
+                            <img
+                              src={getDirectImageUrl(caseImage)}
+                              alt="미리보기"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/caseprev/400/300';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold text-neutral-700">
+                          세부 / 추가 사진
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={caseImage2}
+                            onChange={(e) => setCaseImage2(e.target.value)}
+                            placeholder="보조 이미지 URL"
+                            className="flex-1 text-xs px-3.5 py-2 border border-neutral-200 rounded-xl focus:outline-none focus:border-neutral-950 font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const converted = convertSynologyToDirectUrl(caseImage2);
+                              if (converted !== caseImage2) setCaseImage2(converted);
+                            }}
+                            className="px-3 py-2 text-[11px] bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold rounded-xl whitespace-nowrap cursor-pointer"
+                          >
+                            NAS변환
+                          </button>
+                        </div>
+                        {caseImage2 && (
+                          <div className="w-full h-32 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-100 mt-2">
+                            <img
+                              src={getDirectImageUrl(caseImage2)}
+                              alt="보조 미리보기"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/caseprev2/400/300';
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end space-x-3 pt-4 border-t border-neutral-100">
+                      <button
+                        type="button"
+                        onClick={() => { setIsAddingCase(false); setIsEditingCase(null); }}
+                        className="px-5 py-2.5 border border-neutral-200 hover:border-neutral-400 text-neutral-700 font-sans font-bold text-xs rounded-xl cursor-pointer transition-all"
+                      >
+                        취소하기
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white font-sans font-bold text-xs rounded-xl cursor-pointer transition-all shadow-sm"
+                        id="admin-save-case-btn"
+                      >
+                        {isAddingCase ? '시공사례 등록 완료' : '정보 수정 저장'}
                       </button>
                     </div>
                   </form>
