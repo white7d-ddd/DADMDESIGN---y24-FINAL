@@ -1,0 +1,14 @@
+# robots.txt for dadmdesign.com
+User-agent: *
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+User-agent: Naverbot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+Sitemap: https://dadmdesign.com/sitemap.xml

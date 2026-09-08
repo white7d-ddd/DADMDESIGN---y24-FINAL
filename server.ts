@@ -228,6 +228,35 @@ async function startServer() {
     });
   });
 
+  // Explicit SEO routes for Naver Search Advisor / Google Search Console
+  app.get("/robots.txt", (req, res) => {
+    const robotsPath = path.join(process.cwd(), isProduction ? "dist" : "public", "robots.txt");
+    const fallbackPublic = path.join(process.cwd(), "public", "robots.txt");
+    if (fs.existsSync(robotsPath)) {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      return res.sendFile(robotsPath);
+    } else if (fs.existsSync(fallbackPublic)) {
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      return res.sendFile(fallbackPublic);
+    }
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.send("User-agent: *\nAllow: /\n\nUser-agent: Yeti\nAllow: /\n\nSitemap: https://dadmdesign.com/sitemap.xml\n");
+  });
+
+  app.get("/sitemap.xml", (req, res) => {
+    const sitemapPath = path.join(process.cwd(), isProduction ? "dist" : "public", "sitemap.xml");
+    const fallbackPublic = path.join(process.cwd(), "public", "sitemap.xml");
+    if (fs.existsSync(sitemapPath)) {
+      res.setHeader("Content-Type", "application/xml; charset=utf-8");
+      return res.sendFile(sitemapPath);
+    } else if (fs.existsSync(fallbackPublic)) {
+      res.setHeader("Content-Type", "application/xml; charset=utf-8");
+      return res.sendFile(fallbackPublic);
+    }
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>https://dadmdesign.com/</loc>\n    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`);
+  });
+
   // Fast & Crash-proof Server Database Persistence API
   app.get("/api/db", (req, res) => {
     try {
