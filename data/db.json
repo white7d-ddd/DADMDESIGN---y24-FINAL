@@ -18,7 +18,7 @@
     "featuredTitle": "다듬디자인 조달 등록제품",
     "procurementAutoPlayInterval": 4
   },
-  "updatedAt": "2026-09-08T23:44:05.399Z",
+  "updatedAt": "2026-09-09T01:22:55.993Z",
   "companyInfo": {
     "name": "주식회사 다듬디자인",
     "englishName": "DADMDESIGN CO., LTD.",
@@ -441,7 +441,7 @@
     {
       "id": "case-3",
       "title": "DBB-9000 외 1종",
-      "location": "경남 창원시",
+      "location": "경남 창원시 진해근대역사문화공간",
       "period": "2025. 06 ~ 2025. 12",
       "items": "1600×579×850mm",
       "description": "하늘공원 광장에 대용량 트윈 분리수거함과 수목 보호용 스틸 플랜터를 패키지로 배치 시공 완료하였습니다.",
@@ -454,32 +454,32 @@
     "about": {
       "slogan": "About DADMDESIGN",
       "title": "다듬디자인을 소개합니다",
-      "description": "최고의 랜드마크를 완성하는 프리미엄 조경 디자인 가구의 선두주자"
+      "description": ""
     },
     "procurement": {
       "slogan": "나라장터 조달청 종합쇼핑몰 등재제품",
       "title": "조달등록제품 전시관",
-      "description": "엄격한 조달 표준 규격을 충족하여 신뢰할 수 있는 우수 조달 가로 시설물 리스트입니다."
+      "description": ""
     },
     "products": {
       "slogan": "DADMDESIGN Catalog",
       "title": "제품 전시관",
-      "description": "조달청 등재 최상의 품질을 보장합니다. 최고의 품질과 감각적인 디자인으로 공간의 품격을 높입니다."
+      "description": ""
     },
     "inquiry": {
       "slogan": "Customer Support Center",
       "title": "다듬디자인 고객지원 센터",
-      "description": "온라인 접수 후 담당자가 직접 검토 후 신속하게 응대하겠습니다."
+      "description": ""
     },
     "construction": {
       "slogan": "Construction Portfolio",
       "title": "건설사업 및 시공 실적",
-      "description": "다듬디자인의 엄격한 자재 선별과 완벽한 밀착 직영 시공팀이 완성한 격조 높은 조경 시설 현장들입니다."
+      "description": ""
     },
     "cases": {
       "slogan": "Installation Cases",
       "title": "시공사례",
-      "description": "다듬디자인의 고품질 조경시설물 제품들이 전국 주요 현장에 설치 완료된 시공사례 모음입니다."
+      "description": ""
     },
     "catalog": {
       "slogan": "",

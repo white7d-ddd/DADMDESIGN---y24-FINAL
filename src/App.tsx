@@ -1350,7 +1350,7 @@ export default function App() {
                                 </span>
                               )}
                               <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 font-sans">
-                                {item.title} <span className="text-sm sm:text-base text-neutral-400 font-medium ml-2">({item.year}년)</span>
+                                {item.title}
                               </h3>
                               {item.bullets && item.bullets.length > 0 && (
                                 <ul className="text-sm sm:text-base text-neutral-600 space-y-2 list-disc pl-5 leading-relaxed font-sans">
@@ -1382,12 +1382,12 @@ export default function App() {
                           <span className="text-neutral-900 font-bold text-right">{companyInfo.name}</span>
                         </div>
                         <div className="flex justify-between border-b border-neutral-50 pb-3">
-                          <span className="text-neutral-400 font-medium shrink-0">대표전화</span>
-                          <span className="text-neutral-900 font-mono font-bold text-right">{companyInfo.tel}</span>
-                        </div>
-                        <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">대표자</span>
                           <span className="text-neutral-900 font-medium text-right">{companyInfo.representative}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-neutral-50 pb-3">
+                          <span className="text-neutral-400 font-medium shrink-0">대표전화</span>
+                          <span className="text-neutral-900 font-mono font-bold text-right">{companyInfo.tel}</span>
                         </div>
                         <div className="flex justify-between border-b border-neutral-50 pb-3">
                           <span className="text-neutral-400 font-medium shrink-0">팩스번호</span>
