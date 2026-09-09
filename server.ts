@@ -133,21 +133,86 @@ let inMemoryDB: Record<string, any> = {};
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
 const DB_TEMP_FILE = path.join(DATA_DIR, "db.json.tmp");
+const DB_BACKUP_FILE = path.join(DATA_DIR, "db.backup.json");
+const DB_BASELINE_FILE = path.join(process.cwd(), "public", "baseline-db.json");
 
-// Initialize Database from Disk
+// Helper to check if DB object has valid product data
+function isValidDatabase(dbObj: any): boolean {
+  return (
+    dbObj &&
+    typeof dbObj === "object" &&
+    Array.isArray(dbObj.products) &&
+    dbObj.products.length > 0
+  );
+}
+
+// Initialize Database from Disk with Triple-Layer Fallback
 function initDatabase() {
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
+
+    let loaded = false;
+
+    // 1. Try primary db.json
     if (fs.existsSync(DB_FILE)) {
-      const raw = fs.readFileSync(DB_FILE, "utf-8");
-      if (raw && raw.trim()) {
-        inMemoryDB = JSON.parse(raw);
-        console.log("[DB] Loaded existing data from db.json");
+      try {
+        const raw = fs.readFileSync(DB_FILE, "utf-8");
+        if (raw && raw.trim()) {
+          const parsed = JSON.parse(raw);
+          if (isValidDatabase(parsed)) {
+            inMemoryDB = parsed;
+            loaded = true;
+            console.log(`[DB] Successfully loaded ${parsed.products.length} products from db.json`);
+          }
+        }
+      } catch (e: any) {
+        console.warn("[DB Warning] Primary db.json parse error:", e?.message || e);
       }
-    } else {
-      fs.writeFileSync(DB_FILE, "{}", "utf-8");
+    }
+
+    // 2. If primary missing or empty, try db.backup.json
+    if (!loaded && fs.existsSync(DB_BACKUP_FILE)) {
+      try {
+        const rawBackup = fs.readFileSync(DB_BACKUP_FILE, "utf-8");
+        if (rawBackup && rawBackup.trim()) {
+          const parsedBackup = JSON.parse(rawBackup);
+          if (isValidDatabase(parsedBackup)) {
+            inMemoryDB = parsedBackup;
+            loaded = true;
+            console.log(`[DB Recovery] Loaded ${parsedBackup.products.length} products from db.backup.json`);
+            // Restore to primary
+            fs.writeFileSync(DB_FILE, rawBackup, "utf-8");
+          }
+        }
+      } catch (e: any) {
+        console.warn("[DB Warning] Backup parse error:", e?.message || e);
+      }
+    }
+
+    // 3. If still not loaded, try public/baseline-db.json
+    if (!loaded && fs.existsSync(DB_BASELINE_FILE)) {
+      try {
+        const rawBaseline = fs.readFileSync(DB_BASELINE_FILE, "utf-8");
+        if (rawBaseline && rawBaseline.trim()) {
+          const parsedBaseline = JSON.parse(rawBaseline);
+          if (isValidDatabase(parsedBaseline)) {
+            inMemoryDB = parsedBaseline;
+            loaded = true;
+            console.log(`[DB Recovery] Loaded ${parsedBaseline.products.length} products from baseline-db.json`);
+            fs.writeFileSync(DB_FILE, rawBaseline, "utf-8");
+            fs.writeFileSync(DB_BACKUP_FILE, rawBaseline, "utf-8");
+          }
+        }
+      } catch (e: any) {
+        console.warn("[DB Warning] Baseline parse error:", e?.message || e);
+      }
+    }
+
+    if (!loaded) {
+      console.warn("[DB Warning] No valid baseline found, initialized empty database");
+      inMemoryDB = {};
     }
   } catch (err: any) {
     console.warn("[DB Warning] Initial load from disk fallback to in-memory:", err?.message || err);
@@ -177,6 +242,15 @@ function scheduleDiskSave() {
       // Atomic write using temp file and rename to prevent file corruption
       fs.writeFileSync(DB_TEMP_FILE, dataStr, "utf-8");
       fs.renameSync(DB_TEMP_FILE, DB_FILE);
+
+      // Also persist to backup file asynchronously if valid
+      if (isValidDatabase(inMemoryDB)) {
+        try {
+          fs.writeFileSync(DB_BACKUP_FILE, dataStr, "utf-8");
+        } catch (backupErr) {
+          // non-critical
+        }
+      }
     } catch (err: any) {
       console.warn("[DB Save Warning] Could not persist to disk file (in-memory remains active):", err?.message || err);
     } finally {
@@ -344,6 +418,17 @@ Sitemap: https://dadmdesign.com/sitemap.xml
     } catch (error: any) {
       console.error("[API Error] Writing db:", error?.message || error);
       return res.status(500).json({ error: "Failed to write database", message: error?.message });
+    }
+  });
+
+  // Direct database backup download endpoint
+  app.get("/api/db/export", (req, res) => {
+    try {
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="dadm-db-backup-${new Date().toISOString().split("T")[0]}.json"`);
+      return res.status(200).send(JSON.stringify(inMemoryDB, null, 2));
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to export db", message: err?.message });
     }
   });
 
