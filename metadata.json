@@ -1,6 +1,6 @@
 {
   "name": "Remix: DADMDESIGN - 2026 07 22 ",
-  "description": "다듬디자인(DADM DESIGN) - 조경시설물, 옥외 벤치, 퍼걸러, 휴게쉼터, 스트리트 퍼니처 등 환경 디자인 및 공공시설물 전문 기업",
+  "description": "다듬디자인(DADMDESIGN) - 조경시설물, 옥외용벤치, 퍼걸러, 휴게쉼터, 환경 디자인 및 공공시설물 전문 기업",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

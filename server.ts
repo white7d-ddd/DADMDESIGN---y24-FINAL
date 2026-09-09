@@ -229,32 +229,83 @@ async function startServer() {
   });
 
   // Explicit SEO routes for Naver Search Advisor / Google Search Console
-  app.get("/robots.txt", (req, res) => {
-    const robotsPath = path.join(process.cwd(), isProduction ? "dist" : "public", "robots.txt");
-    const fallbackPublic = path.join(process.cwd(), "public", "robots.txt");
-    if (fs.existsSync(robotsPath)) {
-      res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      return res.sendFile(robotsPath);
-    } else if (fs.existsSync(fallbackPublic)) {
-      res.setHeader("Content-Type", "text/plain; charset=utf-8");
-      return res.sendFile(fallbackPublic);
-    }
+  const STANDARD_ROBOTS_TXT = `User-agent: *
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+Sitemap: https://dadmdesign.com/sitemap.xml
+`;
+
+  app.all(["/robots.txt", "/robots.txt/"], (req, res) => {
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
-    res.send("User-agent: *\nAllow: /\n\nUser-agent: Yeti\nAllow: /\n\nSitemap: https://dadmdesign.com/sitemap.xml\n");
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    try {
+      const robotsPath = path.join(process.cwd(), isProduction ? "dist" : "public", "robots.txt");
+      const fallbackPublic = path.join(process.cwd(), "public", "robots.txt");
+      if (fs.existsSync(robotsPath)) {
+        const content = fs.readFileSync(robotsPath, "utf-8");
+        return res.status(200).send(content);
+      } else if (fs.existsSync(fallbackPublic)) {
+        const content = fs.readFileSync(fallbackPublic, "utf-8");
+        return res.status(200).send(content);
+      }
+    } catch {
+      // Fallback below
+    }
+    return res.status(200).send(STANDARD_ROBOTS_TXT);
   });
 
-  app.get("/sitemap.xml", (req, res) => {
-    const sitemapPath = path.join(process.cwd(), isProduction ? "dist" : "public", "sitemap.xml");
-    const fallbackPublic = path.join(process.cwd(), "public", "sitemap.xml");
-    if (fs.existsSync(sitemapPath)) {
-      res.setHeader("Content-Type", "application/xml; charset=utf-8");
-      return res.sendFile(sitemapPath);
-    } else if (fs.existsSync(fallbackPublic)) {
-      res.setHeader("Content-Type", "application/xml; charset=utf-8");
-      return res.sendFile(fallbackPublic);
-    }
+  app.all(["/sitemap.xml", "/sitemap.xml/"], (req, res) => {
     res.setHeader("Content-Type", "application/xml; charset=utf-8");
-    res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>https://dadmdesign.com/</loc>\n    <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`);
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    try {
+      const sitemapPath = path.join(process.cwd(), isProduction ? "dist" : "public", "sitemap.xml");
+      const fallbackPublic = path.join(process.cwd(), "public", "sitemap.xml");
+      if (fs.existsSync(sitemapPath)) {
+        const content = fs.readFileSync(sitemapPath, "utf-8");
+        return res.status(200).send(content);
+      } else if (fs.existsSync(fallbackPublic)) {
+        const content = fs.readFileSync(fallbackPublic, "utf-8");
+        return res.status(200).send(content);
+      }
+    } catch {
+      // Fallback below
+    }
+    const today = new Date().toISOString().split("T")[0];
+    return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>https://dadmdesign.com/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`);
+  });
+
+  // Explicit Favicon Routes for Search Engines (Naver Yeti, Googlebot, Daum, Bing)
+  app.get(["/favicon.ico", "/favicon.ico/"], (req, res) => {
+    res.setHeader("Content-Type", "image/x-icon");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    const icoPath = path.join(process.cwd(), isProduction ? "dist" : "public", "favicon.ico");
+    const fallbackPublic = path.join(process.cwd(), "public", "favicon.ico");
+    if (fs.existsSync(icoPath)) return res.sendFile(icoPath);
+    if (fs.existsSync(fallbackPublic)) return res.sendFile(fallbackPublic);
+    return res.status(404).end();
+  });
+
+  app.get(["/favicon.svg", "/favicon.svg/"], (req, res) => {
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    const svgPath = path.join(process.cwd(), isProduction ? "dist" : "public", "favicon.svg");
+    const fallbackPublic = path.join(process.cwd(), "public", "favicon.svg");
+    if (fs.existsSync(svgPath)) return res.sendFile(svgPath);
+    if (fs.existsSync(fallbackPublic)) return res.sendFile(fallbackPublic);
+    return res.status(404).end();
+  });
+
+  app.get("/site.webmanifest", (req, res) => {
+    res.setHeader("Content-Type", "application/manifest+json; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    const manifestPath = path.join(process.cwd(), isProduction ? "dist" : "public", "site.webmanifest");
+    const fallbackPublic = path.join(process.cwd(), "public", "site.webmanifest");
+    if (fs.existsSync(manifestPath)) return res.sendFile(manifestPath);
+    if (fs.existsSync(fallbackPublic)) return res.sendFile(fallbackPublic);
+    return res.status(404).end();
   });
 
   // Fast & Crash-proof Server Database Persistence API
