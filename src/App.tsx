@@ -27,7 +27,7 @@ import Footer from './components/Footer';
 import EditableHeader from './components/EditableHeader';
 import ConstructionPortfolio from './components/ConstructionPortfolio';
 import PopupDisplay from './components/PopupDisplay';
-import { getDirectImageUrl } from './utils/imageUtils';
+import { getDirectImageUrl, DEFAULT_BANNER_PLACEHOLDER } from './utils/imageUtils';
 import {
   ProductModal,
   CategoryModal,
@@ -1059,7 +1059,7 @@ export default function App() {
                   {/* Right (7 span): Big scenic hero image */}
                   <div className="lg:col-span-7 relative rounded-2xl overflow-hidden aspect-16/9 shadow-2xl border border-neutral-100 bg-neutral-100">
                     <img
-                      src={getDirectImageUrl(homeSectionInfo.imageUrl)}
+                      src={getDirectImageUrl(homeSectionInfo.imageUrl, DEFAULT_BANNER_PLACEHOLDER)}
                       alt="Landscape architecture"
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
@@ -1310,7 +1310,7 @@ export default function App() {
                     {/* Big Philosophy Image */}
                     <div className="aspect-21/9 bg-neutral-100 border border-neutral-100 rounded-3xl overflow-hidden shadow-lg">
                       <img
-                        src={getDirectImageUrl(companyInfo.aboutUsImage || '/src/assets/images/street_bench_1783302667162.jpg')}
+                        src={getDirectImageUrl(companyInfo.aboutUsImage, DEFAULT_BANNER_PLACEHOLDER)}
                         alt="Company concept"
                         className="w-full h-full object-cover object-center animate-fade-in"
                         referrerPolicy="no-referrer"

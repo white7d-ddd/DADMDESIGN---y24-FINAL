@@ -75,8 +75,12 @@ export function convertSynologyToDirectUrl(url: string): string {
   return candidates[0] || url.trim();
 }
 
-export function getDirectImageUrl(url: string): string {
-  if (!url) return '';
+export const DEFAULT_PRODUCT_PLACEHOLDER = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" fill="%23f8fafc"><rect width="800" height="600" fill="%23f8fafc"/><rect x="24" y="24" width="752" height="552" rx="12" fill="%23f1f5f9" stroke="%23cbd5e1" stroke-width="2" stroke-dasharray="8 8"/><path d="M370 270h60v60h-60zM355 315l35-35 60 60M415 305l20-20 40 40" stroke="%2394a3b8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="385" cy="290" r="8" fill="%2394a3b8"/><text x="50%" y="67%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="%23475569">사진 등록 준비중</text><text x="50%" y="74%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%2394a3b8">관리자 모드에서 사진을 업로드할 수 있습니다</text></svg>`;
+
+export const DEFAULT_BANNER_PLACEHOLDER = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800" fill="%230f172a"><defs><linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%230f172a"/><stop offset="50%" stop-color="%231e293b"/><stop offset="100%" stop-color="%23020617"/></linearGradient></defs><rect width="1600" height="800" fill="url(%23bgGrad)"/><text x="50%" y="46%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="38" letter-spacing="4" fill="%2338bdf8">DADMDESIGN</text><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16" fill="%2394a3b8">배너 이미지 등록 대기중 (관리자에서 사진 업로드 가능)</text></svg>`;
+
+export function getDirectImageUrl(url?: string | null, fallback = DEFAULT_PRODUCT_PLACEHOLDER): string {
+  if (!url || typeof url !== 'string' || !url.trim()) return fallback;
   const cleanUrl = url.trim();
 
   if (cleanUrl.startsWith('/') || cleanUrl.startsWith('data:') || cleanUrl.startsWith('blob:')) {

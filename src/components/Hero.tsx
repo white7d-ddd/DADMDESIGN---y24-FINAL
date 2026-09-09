@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Edit3, Image } from 'lucide-react';
 import { Banner } from '../types';
-import { getDirectImageUrl } from '../utils/imageUtils';
+import { getDirectImageUrl, DEFAULT_BANNER_PLACEHOLDER } from '../utils/imageUtils';
 
 interface HeroProps {
   banners: Banner[];
@@ -65,8 +65,8 @@ export default function Hero({ banners, setActivePage, setSelectedCategory, isAd
           {/* Background Image */}
           <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/85 via-neutral-950/50 to-neutral-950/20 z-10" />
           <img
-            src={getDirectImageUrl(banners[current].imageUrl)}
-            alt={banners[current].title}
+            src={getDirectImageUrl(banners[current]?.imageUrl, DEFAULT_BANNER_PLACEHOLDER)}
+            alt={banners[current]?.title || 'DADMDESIGN'}
             className="w-full h-full object-cover object-center"
             referrerPolicy="no-referrer"
             id={`hero-bg-img-${current}`}
